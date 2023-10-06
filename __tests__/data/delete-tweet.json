@@ -5,7 +5,7 @@
       "eventName": "REMOVE",
       "eventVersion": "1.1",
       "eventSource": "aws:dynamodb",
-      "awsRegion": "us-east-1",
+      "awsRegion": "eu-west-1",
       "dynamodb": {
         "ApproximateCreationDateTime": 1606055595,
         "Keys": "****",
@@ -23,7 +23,7 @@
         "SizeBytes": 190,
         "StreamViewType": "NEW_AND_OLD_IMAGES"
       },
-      "eventSourceARN": "arn:aws:dynamodb:us-east-1:374852340823:table/appsyncmasterclass-backend-dev-TweetsTable-1OXHGXWO4SXHI/stream/2020-10-25T09:50:45.452"
+      "eventSourceARN": "arn:aws:dynamodb:eu-west-1:374852340823:table/appsyncmasterclass-backend-dev-TweetsTable-1OXHGXWO4SXHI/stream/2020-10-25T09:50:45.452"
     }
   ]
 }
