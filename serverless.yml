@@ -9,8 +9,9 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs14.x
   region: eu-west-1
+  stage: dev-yan10 #TODO: NAO DEIXAR SETADO AO LIBERAR PARA PRODUCAO
   environment:
     STAGE: ${self:custom.stage}
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1"
@@ -35,6 +36,7 @@ custom:
 functions:
   confirmUserSignup:
     handler: functions/confirm-user-signup.handler
+    iamRoleStatementsName: confirmUserSignup
     environment:
       USERS_TABLE: !Ref UsersTable
     iamRoleStatements:
@@ -44,6 +46,7 @@ functions:
 
   getImageUploadUrl:
     handler: functions/get-upload-url.handler
+    iamRoleStatementsName: getImageUploadUrl
     environment:
       BUCKET_NAME: !Ref AssetsBucket
     iamRoleStatements:
@@ -55,6 +58,7 @@ functions:
 
   tweet:
     handler: functions/tweet.handler
+    iamRoleStatementsName: tweet    
     environment:
       USERS_TABLE: !Ref UsersTable
       TWEETS_TABLE: !Ref TweetsTable
@@ -71,6 +75,7 @@ functions:
 
   retweet:
     handler: functions/retweet.handler
+    iamRoleStatementsName: retweet        
     environment:
       USERS_TABLE: !Ref UsersTable
       TWEETS_TABLE: !Ref TweetsTable
@@ -94,6 +99,7 @@ functions:
 
   reply:
     handler: functions/reply.handler
+    iamRoleStatementsName: reply        
     environment:
       USERS_TABLE: !Ref UsersTable
       TWEETS_TABLE: !Ref TweetsTable
@@ -115,6 +121,7 @@ functions:
 
   unretweet:
     handler: functions/unretweet.handler
+    iamRoleStatementsName: unretweet            
     environment:
       USERS_TABLE: !Ref UsersTable
       TWEETS_TABLE: !Ref TweetsTable
@@ -141,6 +148,7 @@ functions:
 
   distributeTweets:
     handler: functions/distribute-tweets.handler
+    iamRoleStatementsName: distributeTweets                
     environment:
       RELATIONSHIPS_TABLE: !Ref RelationshipsTable
       TIMELINES_TABLE: !Ref TimelinesTable

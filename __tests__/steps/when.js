@@ -1,5 +1,6 @@
 require('dotenv').config()
 const AWS = require('aws-sdk')
+require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 const fs = require('fs')
 const velocityMapper = require('amplify-appsync-simulator/lib/velocity/value-mapper/mapper')
 const velocityTemplate = require('amplify-velocity-template')

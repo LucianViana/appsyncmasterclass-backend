@@ -1,5 +1,6 @@
 require('dotenv').config()
 const AWS = require('aws-sdk')
+require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 const DocumentClient = new AWS.DynamoDB.DocumentClient()
 const chance = require('chance').Chance()
 const velocityUtil = require('amplify-appsync-simulator/lib/velocity/util')

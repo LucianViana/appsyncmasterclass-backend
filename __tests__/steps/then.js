@@ -1,6 +1,7 @@
 require('dotenv').config()
 const _ = require('lodash')
 const AWS = require('aws-sdk')
+require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 const http = require('axios')
 const fs = require('fs')
 
