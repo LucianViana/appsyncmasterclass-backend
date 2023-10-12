@@ -5,8 +5,9 @@ const chance = require('chance').Chance()
 
 describe('When confirmUserSignup runs', () => {
   it("The user's profile should be saved in DynamoDB", async () => {
-    const { name, email } = given.a_random_user()
-    const username = chance.guid()
+    const name   = "luciano1 viana1"
+    const email  = "luciano.souzaviana1@gmail.com" //given.a_random_user()
+    const username = "luciano1"//chance.guid()
 
     await when.we_invoke_confirmUserSignup(username, name, email)
 
