@@ -10,6 +10,7 @@ describe('When getImageUploadUrl runs', () => {
     [ null, 'image/png' ],
     [ null, null ],
   ])('Returns a signed S3 url for extension %s and content type %s', async (extension, contentType) => {
+    //const username = "luciano1"//chance.guid()
     const username = chance.guid()
     const signedUrl = await when.we_invoke_getImageUploadUrl(username, extension, contentType)
 

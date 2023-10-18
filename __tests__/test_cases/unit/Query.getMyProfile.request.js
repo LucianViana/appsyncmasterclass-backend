@@ -6,7 +6,7 @@ const path = require('path')
 describe('Query.getMyProfile.request template', () => {
   it("Should use username as 'id'", () => {
     const templatePath = path.resolve(__dirname, '../../../mapping-templates/Query.getMyProfile.request.vtl')
-
+    //const username = "luciano1"//chance.guid()
     const username = chance.guid()
     const context = given.an_appsync_context({ username }, {})
     const result = when.we_invoke_an_appsync_template(templatePath, context)

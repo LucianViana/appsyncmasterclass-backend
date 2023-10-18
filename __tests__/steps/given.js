@@ -42,10 +42,10 @@ const an_appsync_context = (identity, args, result, source, info, prev) => {
 }
 
 const an_authenticated_user = async () => {
- // const { name, email, password } = //a_random_user()
-  const password  = "@Aardvark4967"     
-  const name   = "luciano1 viana1"
-  const email  = "luciano.souzaviana1@gmail.com" //given.a_random_user()
+ const { name, email, password } = a_random_user()
+ //  const password  = "aardvark"     
+ //  const name   = "2a6fa7bf-ac3a-4afe-b44e-b15e98414063"
+ //  const email  = "luciano.souzaviana2@gmail.com" //given.a_random_user()
 
   const cognito = new AWS.CognitoIdentityServiceProvider()
 

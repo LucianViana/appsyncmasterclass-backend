@@ -6,7 +6,7 @@ const path = require('path')
 describe('Mutation.editMyProfile.request template', () => {
   it("Should use 'newProfile' fields in expression values", () => {
     const templatePath = path.resolve(__dirname, '../../../mapping-templates/Mutation.editMyProfile.request.vtl')
-
+    //const username = "luciano1"//chance.guid()
     const username = chance.guid()
     const newProfile = {
        name: 'Yan',
