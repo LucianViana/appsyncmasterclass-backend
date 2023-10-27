@@ -28,11 +28,11 @@ describe('Given an authenticated user', () => {
       followersCount: 0,
       followingCount: 0,
       tweetsCount: 0,
-      likesCounts: 0
-      // tweets: {
-      //   nextToken: null,
-      //   tweets: []
-      // }
+      likesCounts: 0,
+       tweets: {
+         nextToken: null,
+         tweets: []
+       }
     })
 
     const [firstName, lastName] = profile.name.split(' ')
@@ -57,16 +57,16 @@ describe('Given an authenticated user', () => {
   //   await then.user_can_download_image_from(downloadUrl)
   // })
 
-  // it('The user can edit his profile with editMyProfile', async () => {
-  //   const newName = chance.first()
-  //   const input = {
-  //     name: newName
-  //   }
-  //   const newProfile = await when.a_user_calls_editMyProfile(user, input)
+  it('The user can edit his profile with editMyProfile', async () => {
+    const newName = chance.first()
+    const input = {
+      name: newName
+    }
+    const newProfile = await when.a_user_calls_editMyProfile(user, input)
 
-  //   expect(newProfile).toMatchObject({
-  //     ...profile,
-  //     name: newName
-  //   })
-  // })
+    expect(newProfile).toMatchObject({
+      ...profile,
+      name: newName
+    })
+  })
 })
