@@ -144,8 +144,9 @@ describe('Given an authenticated user', () => {
 
       it('Should see the retweet when he calls getTweets', async () => {
         const { tweets } = await when.a_user_calls_getTweets(userA, userA.username, 25)
-
-        //expect(tweets).toHaveLength(2)
+        //TODO :NAO ESTA CONTANDO OS TWEETS CORRETAMENTE A CADA TESTE INCLUI MAIS UM PARA FICAR DOIS
+        //AS TABELAS TWEET, TIMELINE, RETWEET, RELATIONSTABLE E LIKE DEVEM SER LIMPAS.
+        expect(tweets).toHaveLength(2)
         expect(tweets[0]).toMatchObject({
           profile: {
             id: userA.username,
@@ -217,44 +218,44 @@ describe('Given an authenticated user', () => {
         anotherTweet = await when.a_user_calls_tweet(userB, text)
       })
 
-      // describe("When user A retweets user B's tweet", () => {
-      //   beforeAll(async () => {
-      //     await when.a_user_calls_retweet(userA, anotherTweet.id)
-      //   })
+      describe("When user A retweets user B's tweet", () => {
+        beforeAll(async () => {
+          await when.a_user_calls_retweet(userA, anotherTweet.id)
+        })
 
-      //   it('Should see the retweet when he calls getTweets', async () => {
-      //     const { tweets } = await when.a_user_calls_getTweets(userA, userA.username, 25)
+        it('Should see the retweet when he calls getTweets', async () => {
+          const { tweets } = await when.a_user_calls_getTweets(userA, userA.username, 25)
   
-      //     expect(tweets).toHaveLength(2)
-      //     expect(tweets[0]).toMatchObject({
-      //       profile: {
-      //         id: userA.username,
-      //         tweetsCount: 2
-      //       },
-      //       retweetOf: {
-      //         ...anotherTweet,
-      //         retweets: 1,
-      //         retweeted: true
-      //       }
-      //     })
-      //   })
+          expect(tweets).toHaveLength(3)
+          expect(tweets[0]).toMatchObject({
+            profile: {
+              id: userA.username,
+              tweetsCount: 3
+            },
+            retweetOf: {
+              ...anotherTweet,
+              retweets: 1,
+              retweeted: true
+            }
+          })
+        })
       //   //TODO :NAO ESTA CONTANDO OS TWEETS CORRETAMENTE A CADA TESTE INCLUI MAIS UM ESTUDAR
-      //   it('Should see the retweet when he calls getMyTimeline', async () => {
-      //     const { tweets } = await when.a_user_calls_getMyTimeline(userA, 25)
+        it('Should see the retweet when he calls getMyTimeline', async () => {
+          const { tweets } = await when.a_user_calls_getMyTimeline(userA, 25)
   
-      //     //expect(tweets).toHaveLength(2)
-      //     // expect(tweets[0]).toMatchObject({
-      //     //   profile: {
-      //     //     id: userA.username,
-      //     //     tweetsCount: 2
-      //     //   },
-      //     //   retweetOf: {
-      //     //     ...anotherTweet,
-      //     //     retweets: 1,
-      //     //     retweeted: true
-      //     //   }
-      //     // })
-      //   })
+          expect(tweets).toHaveLength(2)
+          expect(tweets[0]).toMatchObject({
+            profile: {
+              id: userA.username,
+              tweetsCount: 3
+            },
+            retweetOf: {
+              ...anotherTweet,
+              retweets: 1,
+              retweeted: true
+            }
+          })
+        })
 
 //         describe("When user A unretweets user B's tweet", () => {
 //           beforeAll(async () => {
@@ -288,7 +289,7 @@ describe('Given an authenticated user', () => {
 //             //   }
 // //            })
 //           })
-//         })
+         })
         })
       })
   })
