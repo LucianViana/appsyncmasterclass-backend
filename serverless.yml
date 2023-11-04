@@ -404,13 +404,16 @@ resources:
     WebUserPoolClient:
       Type: AWS::Cognito::UserPoolClient
       Properties:
-        UserPoolId: !Ref CognitoUserPool
         ClientName: web
+        GenerateSecret: false        
+        UserPoolId: !Ref CognitoUserPool        
         ExplicitAuthFlows:
           - ALLOW_USER_SRP_AUTH
           - ALLOW_USER_PASSWORD_AUTH
           - ALLOW_REFRESH_TOKEN_AUTH
+          - ALLOW_ADMIN_USER_PASSWORD_AUTH
         PreventUserExistenceErrors: ENABLED
+
 
     AssetsBucket:
       Type: AWS::S3::Bucket

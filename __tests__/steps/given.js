@@ -112,7 +112,7 @@ const an_authenticated_user = async () => {
   //     PASSWORD: password
   //   }
   // }).promise()
-	try {
+	// try {
   const responseSetUserPassword = await cognito.adminSetUserPassword({
     UserPoolId: userPoolId,
     Username: username,
@@ -126,8 +126,7 @@ const an_authenticated_user = async () => {
     AuthFlow: "ADMIN_NO_SRP_AUTH",
     AuthParameters: {
       USERNAME: username,
-      PASSWORD: password,
-      SECRET_HASH:  crypto.createHmac('sha256', clientSecret).update(username + clientId).digest('base64')
+      PASSWORD: password
     }
   }
   const auth = await cognito.adminInitiateAuth(payload).promise();
@@ -144,17 +143,17 @@ const an_authenticated_user = async () => {
   // const responseInitiateAuth = await cognito.adminInitiateAuth(paramsAdminAuth).promise();
 
   // console.log(`[${email}] - signed in`)
-  }
-	catch (err) {
-		 console.log(err);
-		if (err.code == 'UsernameExistsException') {
+  // }
+	// catch (err) {
+	// 	 console.log(err);
+	// 	if (err.code == 'UsernameExistsException') {
 
-		} else if (err.code == 'InvalidPasswordException') {
+	// 	} else if (err.code == 'InvalidPasswordException') {
 
-		} else {
+	// 	} else {
 
-		}
-	}
+	// 	}
+	// }
   return {
     username,
     name,
