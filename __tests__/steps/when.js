@@ -180,7 +180,7 @@ const we_invoke_confirmUserSignup = async (username, name, email) => {
   const event = {
     "version": "1",
     "region": process.env.AWS_REGION,
-    "userPoolId": process.env.COGNITO_USER_POOL_ID,
+    "userPoolId": process.env.COGNITO_USER_POOL_ID,  
     "userName": username,
     "triggerSource": "PostConfirmation_ConfirmSignUp",
     "request": {
@@ -318,24 +318,70 @@ const a_user_signs_up = async (password, name, email) => {
   const userPoolId = process.env.COGNITO_USER_POOL_ID
   const clientId = process.env.WEB_COGNITO_USER_POOL_CLIENT_ID
 
-  const signUpResp = await cognito.signUp({
-    ClientId: clientId,
-    Username: email,
-    Password: password,
-    UserAttributes: [
-      { Name: 'name', Value: name }
-    ]
-  }).promise()
+  // const signUpResp = await cognito.signUp({
+  //   ClientId: clientId,
+  //   Username: email,
+  //   Password: password,
+  //   UserAttributes: [
+  //     { Name: 'name', Value: name }
+  //   ]
+  // }).promise()
 
-  const username = signUpResp.UserSub
+  const params = {
+    UserPoolId: userPoolId,
+    Username: email,
+    UserAttributes: [{
+        Name: 'email',
+        Value: email
+      },
+      {
+        Name: 'email_verified',
+        Value: 'true'
+      }
+    ],
+    MessageAction: 'SUPPRESS'
+  }
+
+  //const response = await cognito.adminCreateUser(params).promise();
+  const signUpResp = await cognito.adminCreateUser(params).promise();
+
+  //const username = signUpResp.UserSub
+  const user = signUpResp.User
+  const username = user.Username
+
   console.log(`[${email}] - user has signed up [${username}]`)
 
-  await cognito.adminConfirmSignUp({
-    UserPoolId: userPoolId,
-    Username: username
-  }).promise()
+  // const paramsForSetPass = {
+  //   Password: password,
+  //   UserPoolId: userPoolId,
+  //   Username: email,
+  //   Permanent: true
+  // };
 
-  console.log(`[${email}] - confirmed sign up`)
+  // const responseSetUserPassword = await cognito.adminSetUserPassword(paramsForSetPass).promise()
+
+  // console.log(`[${email}] - confirmed sign up`)
+  
+
+  // await cognito.adminConfirmSignUp({
+  //   UserPoolId: userPoolId,
+  //   Username: username
+  // }).promise()
+ 
+  // const paramsAdminAuth = {
+  //   AuthFlow: "ADMIN_NO_SRP_AUTH",
+  //   UserPoolId: userPoolId,
+  //   ClientId: clientId,
+  //   AuthParameters: {
+  //     USERNAME: email,
+  //     PASSWORD: password
+  //   }
+  // }
+
+  //  const responseInitiateAuth = await cognito.adminInitiateAuth(paramsAdminAuth).promise();
+
+  // console.log(`[${email}] - signed in`)
+
 
   return {
     username,
