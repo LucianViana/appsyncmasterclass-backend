@@ -1,8 +1,6 @@
 require('dotenv').config()
 const AWS = require('aws-sdk')
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
-const crypto = require('crypto');
-const clientSecret = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
 const DocumentClient = new AWS.DynamoDB.DocumentClient()
 const chance = require('chance').Chance()
 const velocityUtil = require('amplify-appsync-simulator/lib/velocity/util')
@@ -44,116 +42,75 @@ const an_appsync_context = (identity, args, result, source, info, prev) => {
 }
 
 const an_authenticated_user = async () => {
- const { name, email, password } = a_random_user()
- //  const password  = "aardvark"     
- //  const name   = "2a6fa7bf-ac3a-4afe-b44e-b15e98414063"
- //  const email  = "luciano.souzaviana2@gmail.com" //given.a_random_user()
-
+  const { name, email, password } = a_random_user()
   const cognito = new AWS.CognitoIdentityServiceProvider()
-
   const userPoolId = process.env.COGNITO_USER_POOL_ID
   const clientId = process.env.WEB_COGNITO_USER_POOL_CLIENT_ID
-
-  // const signUpResp = await cognito.signUp({
-  //   ClientId: clientId,
-  //   Username: email,
-  //   Password: password,
-  //   UserAttributes: [
-  //     { Name: 'name', Value: name }
-  //   ]
-  // }).promise()
-
-   const params = {
-     UserPoolId: userPoolId,
-     Username: email,
-     UserAttributes: [{
-         Name: 'email',
-         Value: email
-       },
-       {
-         Name: 'email_verified',
-         Value: 'true'
-       }
-     ],
-     MessageAction: 'SUPPRESS'
-   }
-
-  //const response = await cognito.adminCreateUser(params).promise();
-  const signUpResp = await cognito.adminCreateUser(params).promise();
-
-  //const username = signUpResp.UserSub
-  const user = signUpResp.User
-  const username = user.Username
-  console.log(`[${email}] - user has signed up [${username}]`)
-
-  // await cognito.adminConfirmSignUp({
-  //   UserPoolId: userPoolId,
-  //   Username: username
-  // }).promise()
-
-  // const paramsForSetPass = {
-  //   Password: password,
-  //   UserPoolId: userPoolId,
-  //   Username: email,
-  //   Permanent: true
-  // };
-
-  // const responseSetUserPassword = await cognito.adminSetUserPassword(paramsForSetPass).promise()
-
-
-  // console.log(`[${email}] - confirmed set user password`)
-  // console.log(`[${email}] - confirmed sign up`)
-
-  // const auth = await cognito.initiateAuth({
-  //   AuthFlow: 'USER_PASSWORD_AUTH',
-  //   ClientId: clientId,
-  //   AuthParameters: {
-  //     USERNAME: username,
-  //     PASSWORD: password
-  //   }
-  // }).promise()
-	// try {
-  const responseSetUserPassword = await cognito.adminSetUserPassword({
-    UserPoolId: userPoolId,
-    Username: username,
-    Password: password,
-    Permanent: true
-  }).promise();
-
-  const payload = { 
-    UserPoolId: userPoolId,
-    ClientId: clientId,
-    AuthFlow: "ADMIN_NO_SRP_AUTH",
-    AuthParameters: {
-      USERNAME: username,
-      PASSWORD: password
+	try {
+    const params = {
+      UserPoolId: userPoolId,
+      Username: email,
+      MessageAction: 'SUPPRESS',
+      UserAttributes: [
+        {
+          Name: 'name',
+          Value: name,
+        },
+        {
+          Name: 'email',
+          Value: email
+        },
+        {
+          Name: 'email_verified',
+          Value: 'true'
+        }
+      ],
+      ClientMetadata: {
+        ClientId: clientId,
+      },
+      TemporaryPassword: 'Password-1Password-1'
     }
+
+    const signUpResp = await cognito.adminCreateUser(params).promise();
+    const user = signUpResp.User
+    const username = user.Username
+    console.log(`[${email}] - user has signed up [${username}]`)
+
+    const payload = { 
+      AuthFlow: "USER_PASSWORD_AUTH",
+      ClientId: clientId,    
+      AuthParameters: {
+        USERNAME: username,
+        PASSWORD: 'Password-1Password-1'
+      }
+    }
+      const auth = await cognito.initiateAuth(payload).promise();
+
+    const challengeResp = await cognito
+          .respondToAuthChallenge({
+            ChallengeName: 'NEW_PASSWORD_REQUIRED',
+            Session: auth.Session,
+            //UserPoolId: userPoolId,
+            ChallengeResponses: {
+              USERNAME: username,
+              NEW_PASSWORD: password,
+            },
+            ClientId: clientId,          
+          })
+          .promise()
+
+          console.log({challengeResp})
   }
-  const auth = await cognito.adminInitiateAuth(payload).promise();
+	catch (err) {
+		 console.log(err);
+		if (err.code == 'UsernameExistsException') {
 
-  // const paramsAdminAuth = {
-  //   AuthFlow: "ADMIN_NO_SRP_AUTH",
-  //   UserPoolId: userPoolId,
-  //   ClientId: clientId,
-  //   AuthParameters: {
-  //     USERNAME: email,
-  //     PASSWORD: password
-  //   }
-  // }
-  // const responseInitiateAuth = await cognito.adminInitiateAuth(paramsAdminAuth).promise();
+		} else if (err.code == 'InvalidPasswordException') {
 
-  // console.log(`[${email}] - signed in`)
-  // }
-	// catch (err) {
-	// 	 console.log(err);
-	// 	if (err.code == 'UsernameExistsException') {
+		} else {
 
-	// 	} else if (err.code == 'InvalidPasswordException') {
-
-	// 	} else {
-
-	// 	}
-	// }
+		}
+	}
   return {
     username,
     name,

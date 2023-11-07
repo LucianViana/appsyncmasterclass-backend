@@ -9,7 +9,6 @@ describe('Given authenticated users, user A and B', () => {
   let userBsTweet1, userBsTweet2
   beforeAll(async () => {
     userA = await given.an_authenticated_user()
-    //TODO :NAO ESTA RETORNANDO UM USERawait given.an_authenticated_user(
     userB = await given.an_authenticated_user()
     userAsProfile = await when.a_user_calls_getMyProfile(userA)
     userBsProfile = await when.a_user_calls_getMyProfile(userB)
@@ -39,7 +38,7 @@ describe('Given authenticated users, user A and B', () => {
     it("User A should see himself in user B's list of followers", async () => {
       const { profiles } = await when.a_user_calls_getFollowers(userA, userB.username, 25)
 
-      //expect(profiles).toHaveLength(1)
+      expect(profiles).toHaveLength(1)
       expect(profiles[0]).toMatchObject({
         id: userA.username
       })
@@ -50,7 +49,7 @@ describe('Given authenticated users, user A and B', () => {
     it("User A should see user B in his list of following", async () => {
       const { profiles } = await when.a_user_calls_getFollowing(userA, userA.username, 25)
 
-      //expect(profiles).toHaveLength(1)
+      expect(profiles).toHaveLength(1)
       expect(profiles[0]).toMatchObject({
         id: userB.username,
         following: true,
@@ -61,7 +60,7 @@ describe('Given authenticated users, user A and B', () => {
     it("User B should see user A in his list of followers", async () => {
       const { profiles } = await when.a_user_calls_getFollowers(userB, userB.username, 25)
 
-      //expect(profiles).toHaveLength(1)
+      expect(profiles).toHaveLength(1)
       expect(profiles[0]).toMatchObject({
         id: userA.username,
         following: false,
@@ -72,14 +71,14 @@ describe('Given authenticated users, user A and B', () => {
     it("User B should not see user A in his list of following", async () => {
       const { profiles } = await when.a_user_calls_getFollowing(userB, userB.username, 25)
 
-      //expect(profiles).toHaveLength(0)
+      expect(profiles).toHaveLength(0)
     })
 
     it("Adds user B's tweets to user A's timeline", async () => {
       retry(async () => {
         const { tweets } = await when.a_user_calls_getMyTimeline(userA, 25)
   
-        //expect(tweets).toHaveLength(2)
+        expect(tweets).toHaveLength(2)
         expect(tweets).toEqual([
           expect.objectContaining({
             id: userBsTweet2.id
@@ -105,7 +104,7 @@ describe('Given authenticated users, user A and B', () => {
         await retry(async () => {
           const { tweets } = await when.a_user_calls_getMyTimeline(userA, 25)
   
-          //expect(tweets).toHaveLength(3)
+          expect(tweets).toHaveLength(3)
           expect(tweets[0].id).toEqual(tweet.id)
         }, {
           retries: 3,
@@ -145,7 +144,7 @@ describe('Given authenticated users, user A and B', () => {
         await retry(async () => {
           const { tweets } = await when.a_user_calls_getMyTimeline(userB, 25)
   
-          //expect(tweets).toHaveLength(4)
+          expect(tweets).toHaveLength(4)
           expect(tweets[0].id).toEqual(tweet.id)
         }, {
           retries: 3,
@@ -178,7 +177,7 @@ describe('Given authenticated users, user A and B', () => {
       retry(async () => {
         const { tweets } = await when.a_user_calls_getMyTimeline(userA, 25)
   
-        //expect(tweets).toHaveLength(1)
+        expect(tweets).toHaveLength(1)
         expect(tweets).toEqual([
           expect.objectContaining({
             profile: {

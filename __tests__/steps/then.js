@@ -1,7 +1,6 @@
 require('dotenv').config()
 const _ = require('lodash')
 const AWS = require('aws-sdk')
-require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 const http = require('axios')
 const fs = require('fs')
 
@@ -113,7 +112,7 @@ const retweet_does_not_exist_in_TweetsTable = async (userId, tweetId) => {
     Limit: 1
   }).promise()
 
-  //expect(resp.Items).toHaveLength(0)
+  expect(resp.Items).toHaveLength(0)
 
   return null
 }

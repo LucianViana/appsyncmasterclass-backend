@@ -4,11 +4,6 @@ const then = require('../../steps/then')
 
 describe('When a user signs up', () => {
   it("The user's profile should be saved in DynamoDB", async () => {
-    // const password  = "@Aardvark4967"     
-    // const name   = "luciano viana"
-    // const email  = "luciano.souzaviana@gmail.com" //given.a_random_user()
-
-
     const { password, name, email } = given.a_random_user()
 
     const user = await when.a_user_signs_up(password, name, email)
