@@ -8,12 +8,17 @@ describe('Given authenticated users, user A and B', () => {
   let userA, userB, userAsProfile, userBsProfile
   let userBsTweet1, userBsTweet2
   beforeAll(async () => {
-    userA = await given.an_authenticated_user()
-    userB = await given.an_authenticated_user()
-    userAsProfile = await when.a_user_calls_getMyProfile(userA)
-    userBsProfile = await when.a_user_calls_getMyProfile(userB)
-    userBsTweet1 = await when.a_user_calls_tweet(userB, chance.paragraph())
-    userBsTweet2 = await when.a_user_calls_tweet(userB, chance.paragraph())
+    try {
+      userA = await given.an_authenticated_user()
+      userB = await given.an_authenticated_user()
+      userAsProfile = await when.a_user_calls_getMyProfile(userA)
+      userBsProfile = await when.a_user_calls_getMyProfile(userB)
+      userBsTweet1 = await when.a_user_calls_tweet(userB, chance.paragraph())
+      userBsTweet2 = await when.a_user_calls_tweet(userB, chance.paragraph())
+    }
+    catch (err) {
+       console.log(err);
+    }      
   })
 
   describe("When user A follows user B", () => {

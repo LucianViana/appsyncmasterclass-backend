@@ -47,77 +47,76 @@ const an_authenticated_user = async () => {
   const userPoolId = process.env.COGNITO_USER_POOL_ID
   const clientId = process.env.WEB_COGNITO_USER_POOL_CLIENT_ID
 	try {
-    const params = {
-      UserPoolId: userPoolId,
-      Username: email,
-      MessageAction: 'SUPPRESS',
-      UserAttributes: [
-        {
-          Name: 'name',
-          Value: name,
+      const params = {
+        UserPoolId: userPoolId,
+        Username: email,
+        MessageAction: 'SUPPRESS',
+        UserAttributes: [
+          {
+            Name: 'name',
+            Value: name,
+          },
+          {
+            Name: 'email',
+            Value: email
+          },
+          {
+            Name: 'email_verified',
+            Value: 'true'
+          }
+        ],
+        ClientMetadata: {
+          ClientId: clientId,
         },
-        {
-          Name: 'email',
-          Value: email
-        },
-        {
-          Name: 'email_verified',
-          Value: 'true'
-        }
-      ],
-      ClientMetadata: {
-        ClientId: clientId,
-      },
-      TemporaryPassword: 'Password-1Password-1'
-    }
-
-    const signUpResp = await cognito.adminCreateUser(params).promise();
-    const user = signUpResp.User
-    const username = user.Username
-    console.log(`[${email}] - user has signed up [${username}]`)
-
-    const payload = { 
-      AuthFlow: "USER_PASSWORD_AUTH",
-      ClientId: clientId,    
-      AuthParameters: {
-        USERNAME: username,
-        PASSWORD: 'Password-1Password-1'
+        TemporaryPassword: 'Password-1Password-1'
       }
-    }
+
+      const signUpResp = await cognito.adminCreateUser(params).promise();
+      const user = signUpResp.User
+      const username = user.Username
+      console.log(`[${email}] - user has signed up [${username}]`)
+
+      const payload = { 
+        AuthFlow: "USER_PASSWORD_AUTH",
+        ClientId: clientId,    
+        AuthParameters: {
+          USERNAME: username,
+          PASSWORD: 'Password-1Password-1'
+        }
+      }
       const auth = await cognito.initiateAuth(payload).promise();
+      const challengeResp = await cognito
+            .respondToAuthChallenge({
+              ChallengeName: 'NEW_PASSWORD_REQUIRED',
+              Session: auth.Session,
+              //UserPoolId: userPoolId,
+              ChallengeResponses: {
+                USERNAME: username,
+                NEW_PASSWORD: password,
+              },
+              ClientId: clientId,          
+            })
+            .promise()
 
-    const challengeResp = await cognito
-          .respondToAuthChallenge({
-            ChallengeName: 'NEW_PASSWORD_REQUIRED',
-            Session: auth.Session,
-            //UserPoolId: userPoolId,
-            ChallengeResponses: {
-              USERNAME: username,
-              NEW_PASSWORD: password,
-            },
-            ClientId: clientId,          
-          })
-          .promise()
-
-          console.log({challengeResp})
+            console.log({challengeResp})
+    return {
+      username,
+      name,
+      email,
+      idToken: auth.$response.data.idToken,
+      accessToken: auth.$response.data.AccessToken
+    }
   }
-	catch (err) {
-		 console.log(err);
-		if (err.code == 'UsernameExistsException') {
+  catch (err) {
+    console.log(err);
+    if (err.code == 'UsernameExistsException') {
 
-		} else if (err.code == 'InvalidPasswordException') {
+    } else if (err.code == 'InvalidPasswordException') {
 
-		} else {
+    } else {
 
-		}
-	}
-  return {
-    username,
-    name,
-    email,
-    idToken: auth.AuthenticationResult.IdToken,
-    accessToken: auth.AuthenticationResult.AccessToken
-  }
+    }
+  }  
 }
 
 const a_user_follows_another = async (userId, otherUserId) => {
