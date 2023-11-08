@@ -6,6 +6,7 @@ const chance = require('chance').Chance()
 const velocityUtil = require('amplify-appsync-simulator/lib/velocity/util')
 
 const { RELATIONSHIPS_TABLE } = process.env
+const when = require('./when');
 
 const a_random_user = () => {
   const firstName = chance.first({ nationality: 'en' })
@@ -84,7 +85,7 @@ const an_authenticated_user = async () => {
           PASSWORD: 'Password-1Password-1'
         }
       }
-        const auth = await cognito.initiateAuth(payload).promise();
+      const auth = await cognito.initiateAuth(payload).promise();
 
       const challengeResp = await cognito
             .respondToAuthChallenge({
@@ -98,7 +99,32 @@ const an_authenticated_user = async () => {
             })
             .promise()
 
-            console.log({challengeResp})
+      console.log(challengeResp + `incluir - user has signed up [${username}]`)
+
+            // it("should save in DB the user's profile", async () => {
+            //   const { name, email } = given.a_random_user();
+            //   const username = chance.guid();
+        
+      insertUsersTable =  await when.we_invoke_confirmUserSignup(username, name, email);
+      
+      console.log(insertUsersTable + `incluir - user has signed up [${username}]`)
+              // const ddbUser = await then.user_exists_in_UsersTable(username);
+        
+              // expect(ddbUser).toMatchObject({
+              //   id: username,
+              //   name,
+              //   createdAt: expect.stringMatching(/\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?Z?/g),
+              //   followersCount: 0,
+              //   followingCount: 0,
+              //   tweetsCount: 0
+              //   //TODO : NAO FUNCIONA COM 1 E COM ZERO OLHAR.
+              //   //likesCount: 0
+              // });
+        
+              // const [firstName, lastName] = name.split(' ');
+              // expect(ddbUser.screenName).toContain(firstName);
+              // expect(ddbUser.screenName).toContain(lastName);
+            // })
 
             
     return {

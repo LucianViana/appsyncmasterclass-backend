@@ -318,70 +318,24 @@ const a_user_signs_up = async (password, name, email) => {
   const userPoolId = process.env.COGNITO_USER_POOL_ID
   const clientId = process.env.WEB_COGNITO_USER_POOL_CLIENT_ID
 
-  // const signUpResp = await cognito.signUp({
-  //   ClientId: clientId,
-  //   Username: email,
-  //   Password: password,
-  //   UserAttributes: [
-  //     { Name: 'name', Value: name }
-  //   ]
-  // }).promise()
-
-  const params = {
-    UserPoolId: userPoolId,
+  const signUpResp = await cognito.signUp({
+    ClientId: clientId,
     Username: email,
-    UserAttributes: [{
-        Name: 'email',
-        Value: email
-      },
-      {
-        Name: 'email_verified',
-        Value: 'true'
-      }
-    ],
-    MessageAction: 'SUPPRESS'
-  }
+    Password: password,
+    UserAttributes: [
+      { Name: 'name', Value: name }
+    ]
+  }).promise()
 
-  //const response = await cognito.adminCreateUser(params).promise();
-  const signUpResp = await cognito.adminCreateUser(params).promise();
-
-  //const username = signUpResp.UserSub
-  const user = signUpResp.User
-  const username = user.Username
-
+  const username = signUpResp.UserSub
   console.log(`[${email}] - user has signed up [${username}]`)
 
-  // const paramsForSetPass = {
-  //   Password: password,
-  //   UserPoolId: userPoolId,
-  //   Username: email,
-  //   Permanent: true
-  // };
+  await cognito.adminConfirmSignUp({
+    UserPoolId: userPoolId,
+    Username: username
+  }).promise()
 
-  // const responseSetUserPassword = await cognito.adminSetUserPassword(paramsForSetPass).promise()
-
-  // console.log(`[${email}] - confirmed sign up`)
-  
-
-  // await cognito.adminConfirmSignUp({
-  //   UserPoolId: userPoolId,
-  //   Username: username
-  // }).promise()
- 
-  // const paramsAdminAuth = {
-  //   AuthFlow: "ADMIN_NO_SRP_AUTH",
-  //   UserPoolId: userPoolId,
-  //   ClientId: clientId,
-  //   AuthParameters: {
-  //     USERNAME: email,
-  //     PASSWORD: password
-  //   }
-  // }
-
-  //  const responseInitiateAuth = await cognito.adminInitiateAuth(paramsAdminAuth).promise();
-
-  // console.log(`[${email}] - signed in`)
-
+  console.log(`[${email}] - confirmed sign up`)
 
   return {
     username,
@@ -391,35 +345,40 @@ const a_user_signs_up = async (password, name, email) => {
 }
 
 const we_invoke_an_appsync_template = (templatePath, context) => {
-  const template = fs.readFileSync(templatePath, { encoding: 'utf-8' })
-  const ast = velocityTemplate.parse(template)
-  const compiler = new velocityTemplate.Compile(ast, {
-    valueMapper: velocityMapper.map,
-    escape: false
-  })
-  return JSON.parse(compiler.render(context))
-}
+    const template = fs.readFileSync(templatePath, { encoding: 'utf-8' })
+    const ast = velocityTemplate.parse(template)
+    const compiler = new velocityTemplate.Compile(ast, {
+      valueMapper: velocityMapper.map,
+      escape: false
+    })
+    return JSON.parse(compiler.render(context))
+  }
 
-const a_user_calls_getMyProfile = async (user) => {
-  const getMyProfile = `query getMyProfile {
-    getMyProfile {
-      ... myProfileFields
+  const a_user_calls_getMyProfile = async (user) => {
+    try {    
+      const getMyProfile = `query getMyProfile {
+        getMyProfile {
+          ... myProfileFields
 
-      tweets {
-        nextToken
-        tweets {
-          ... iTweetFields
+          tweets {
+            nextToken
+            tweets {
+              ... iTweetFields
+            }
+          }
         }
-      }
+      }`
+
+      const data = await GraphQL(process.env.API_URL, getMyProfile, {}, user.accessToken)
+      const profile = data.getMyProfile
+
+      console.log(`[${user.username}] - fetched profile`)
+
+      return profile
     }
-  }`
-
-  const data = await GraphQL(process.env.API_URL, getMyProfile, {}, user.accessToken)
-  const profile = data.getMyProfile
-
-  console.log(`[${user.username}] - fetched profile`)
-
-  return profile
+    catch (err) {
+      console.log(err);
+    }   
 }
 
 const a_user_calls_getProfile = async (user, screenName) => {
