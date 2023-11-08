@@ -75,10 +75,17 @@ const an_authenticated_user = async () => {
       const user = signUpResp.User
       const username = user.Username
       console.log(`[${email}] - user has signed up [${username}]`)
-      
-      const {
-        AuthenticationResult: {IdToken, AccessToken},
-      } = await authorizeUser({username, password, clientId})
+
+      const payload = { 
+        AuthFlow: "USER_PASSWORD_AUTH",
+        ClientId: clientId,    
+        AuthParameters: {
+          USERNAME: username,
+          PASSWORD: 'Password-1Password-1'
+        }
+      }
+        const auth = await cognito.initiateAuth(payload).promise();
+
       const challengeResp = await cognito
             .respondToAuthChallenge({
               ChallengeName: 'NEW_PASSWORD_REQUIRED',
@@ -92,12 +99,14 @@ const an_authenticated_user = async () => {
             .promise()
 
             console.log({challengeResp})
+
+            
     return {
       username,
       name,
       email,
-      idToken: IdToken,
-      accessToken: AccessToken
+      idToken: challengeResp.AuthenticationResult.IdToken,
+      accessToken: challengeResp.AuthenticationResult.AccessToken
     }
   }
   catch (err) {
@@ -110,23 +119,6 @@ const an_authenticated_user = async () => {
 
     }
   }  
-}
-
-const authorizeUser = async ({
-  username,
-  password,
-  clientId,
-}) => {
-  const cognito = new AWS.CognitoIdentityServiceProvider()
-  const payload = { 
-    AuthFlow: "USER_PASSWORD_AUTH",
-    ClientId: clientId,    
-    AuthParameters: {
-      USERNAME: username,
-      PASSWORD: 'Password-1Password-1'
-    }
-  }  
-  return cognito.initiateAuth(payload).promise()
 }
 
 const a_user_follows_another = async (userId, otherUserId) => {
