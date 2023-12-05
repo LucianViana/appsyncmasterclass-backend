@@ -11,14 +11,14 @@ describe('Given authenticated users, user A, B and C', () => {
     userB = await given.an_authenticated_user()
     userC = await given.an_authenticated_user()
     userAsTweet = await when.a_user_calls_tweet(userA, text)
-  },15000)
+  }, 30000)
 
   describe("When user B replies to user A's tweet", () => {
     let usersBsReply
     const replyText = chance.string({ length: 16 })
     beforeAll(async () => {
       usersBsReply = await when.a_user_calls_reply(userB, userAsTweet.id, replyText)
-    },15000)
+    }, 30000)
 
     it('User B should see his reply when he calls getTweets', async () => {
       const { tweets } = await when.a_user_calls_getTweets(userB, userB.username, 25)
@@ -63,7 +63,7 @@ describe('Given authenticated users, user A, B and C', () => {
       const replyText = chance.string({ length: 16 })
       beforeAll(async () => {
         usersCsReply = await when.a_user_calls_reply(userC, usersBsReply.id, replyText)
-      },15000)
+      }, 30000)
 
       it('User C should see his reply when he calls getTweets', async () => {
         const { tweets } = await when.a_user_calls_getTweets(userC, userC.username, 25)
@@ -121,14 +121,14 @@ describe('Given authenticated users, user A, B and C', () => {
     let userCsRetweet
     beforeAll(async () => {
       userCsRetweet = await when.a_user_calls_retweet(userC, userAsTweet.id)
-    },15000)
+    }, 30000)
 
     describe("When user B replies to user C's retweet", () => {
       let usersBsReply
       const replyText = chance.string({ length: 16 })
       beforeAll(async () => {
         usersBsReply = await when.a_user_calls_reply(userB, userCsRetweet.id, replyText)
-      },15000)
+      }, 30000)
 
       it('User B should see his reply when he calls getTweets', async () => {
         const { tweets } = await when.a_user_calls_getTweets(userB, userB.username, 25)

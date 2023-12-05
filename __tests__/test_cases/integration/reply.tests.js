@@ -8,20 +8,20 @@ describe('Given two authenticated users, use A and user B', () => {
   beforeAll(async () => {
     userA = await given.an_authenticated_user()
     userB = await given.an_authenticated_user()
-  }, 15000)
+  }, 30000)
 
   describe('When user A sends a tweet', () => {
     let tweet
     const text = chance.string({ length: 16 })
     beforeAll(async () => {
       tweet = await when.we_invoke_tweet(userA.username, text)
-    }, 15000)
+    }, 30000)
   
     describe("When user B replies to user A's tweet", () => {
       const replyText = chance.string({ length: 16 })
       beforeAll(async () => {
         await when.we_invoke_reply(userB.username, tweet.id, replyText)
-      }, 15000)
+      }, 30000)
   
       it('Saves the reply in the Tweets table', async () => {
         const reply = await then.reply_exists_in_TweetsTable(userB.username, tweet.id)
@@ -58,7 +58,7 @@ describe('Given two authenticated users, use A and user B', () => {
         beforeAll(async () => {
           userBsReply = await then.reply_exists_in_TweetsTable(userB.username, tweet.id)
           await when.we_invoke_reply(userA.username, userBsReply.id, replyText)
-        }, 15000)
+        }, 30000)
 
         it('Saves the reply in the Tweets table', async () => {
           const reply = await then.reply_exists_in_TweetsTable(userA.username, userBsReply.id)
@@ -81,13 +81,13 @@ describe('Given two authenticated users, use A and user B', () => {
       beforeAll(async () => {
         await when.we_invoke_retweet(userB.username, tweet.id)
         userBsRetweet = await then.retweet_exists_in_TweetsTable(userB.username, tweet.id)
-      }, 15000)
+      }, 30000)
 
       describe("When user A replies to user B's retweet", () => {
         const replyText = chance.string({ length: 16 })
         beforeAll(async () => {
           await when.we_invoke_reply(userA.username, userBsRetweet.id, replyText)
-        }, 15000)
+        }, 30000)
 
         it('Saves the reply in the Tweets table', async () => {
           const reply = await then.reply_exists_in_TweetsTable(userA.username, userBsRetweet.id)

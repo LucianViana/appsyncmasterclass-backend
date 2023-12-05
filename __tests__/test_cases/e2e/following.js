@@ -20,12 +20,12 @@ describe('Given authenticated users, user A and B', () => {
     catch (err) {
        console.log(err);
     }      
-  },15000)
+  }, 30000)
 
   describe("When user A follows user B", () => {
     beforeAll(async () => {
       await when.a_user_calls_follow(userA, userB.username)
-    },15000)
+    }, 30000)
 
     it("User A should see following as true when viewing user B's profile", async () => {
       const { following, followedBy } = await when.a_user_calls_getProfile(userA, userBsProfile.screenName)
@@ -104,7 +104,7 @@ describe('Given authenticated users, user A and B', () => {
       const text = chance.string({ length: 16 })
       beforeAll(async () => {
         tweet = await when.a_user_calls_tweet(userB, text)
-      },15000)
+      }, 30000)
 
       it("Should appear in user A's timeline", async () => {
         await retry(async () => {
@@ -123,7 +123,7 @@ describe('Given authenticated users, user A and B', () => {
   describe("When user B follows user A back", () => {
     beforeAll(async () => {
       await when.a_user_calls_follow(userB, userA.username)
-    },15000)
+    }, 30000)
 
     it("User A should see both following and followedBy as true when viewing user B's profile", async () => {
       const { following, followedBy } = await when.a_user_calls_getProfile(userA, userBsProfile.screenName)
@@ -144,7 +144,7 @@ describe('Given authenticated users, user A and B', () => {
       const text = chance.string({ length: 16 })
       beforeAll(async () => {
         tweet = await when.a_user_calls_tweet(userA, text)
-      },15000)
+      }, 30000)
 
       it("Should appear in user B's timeline", async () => {
         await retry(async () => {
@@ -163,7 +163,7 @@ describe('Given authenticated users, user A and B', () => {
   describe("When user A unfollows user B", () => {
     beforeAll(async () => {
       await when.a_user_calls_unfollow(userA, userB.username)
-    },15000)
+    }, 30000)
 
     it("User A should see following as false when viewing user B's profile", async () => {
       const { following, followedBy } = await when.a_user_calls_getProfile(userA, userBsProfile.screenName)

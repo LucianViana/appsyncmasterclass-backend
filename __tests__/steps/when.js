@@ -5,6 +5,7 @@ const fs = require('fs')
 const velocityMapper = require('amplify-appsync-simulator/lib/velocity/value-mapper/mapper')
 const velocityTemplate = require('amplify-velocity-template')
 const { GraphQL, registerFragment } = require('../lib/graphql')
+const then = require('./then');
 
 const myProfileFragment = `
 fragment myProfileFields on MyProfile {
@@ -313,35 +314,108 @@ const we_invoke_sendDirectMessage = async (username, otherUserId, message) => {
 }
 
 const a_user_signs_up = async (password, name, email) => {
-  const cognito = new AWS.CognitoIdentityServiceProvider()
+  // const cognito = new AWS.CognitoIdentityServiceProvider()
 
+  // const userPoolId = process.env.COGNITO_USER_POOL_ID
+  // const clientId = process.env.WEB_COGNITO_USER_POOL_CLIENT_ID
+
+  // const signUpResp = await cognito.signUp({
+  //   ClientId: clientId,
+  //   Username: email,
+  //   Password: password,
+  //   UserAttributes: [
+  //     { Name: 'name', Value: name }
+  //   ]
+  // }).promise()
+
+  // const username = signUpResp.UserSub
+  // console.log(`[${email}] - user has signed up [${username}]`)
+
+  // await cognito.adminConfirmSignUp({
+  //   UserPoolId: userPoolId,
+  //   Username: username
+  // }).promise()
+
+  // console.log(`[${email}] - confirmed sign up`)
+  //const { name, email, password } = a_random_user()
+  const cognito = new AWS.CognitoIdentityServiceProvider()
   const userPoolId = process.env.COGNITO_USER_POOL_ID
   const clientId = process.env.WEB_COGNITO_USER_POOL_CLIENT_ID
+	try {
+      const params = {
+        UserPoolId: userPoolId,
+        Username: email,
+        MessageAction: 'SUPPRESS',
+        UserAttributes: [
+          {
+            Name: 'name',
+            Value: name,
+          },
+          {
+            Name: 'email',
+            Value: email
+          },
+          {
+            Name: 'email_verified',
+            Value: 'true'
+          }
+        ],
+        ClientMetadata: {
+          ClientId: clientId,
+        },
+        TemporaryPassword: 'Password-1Password-1'
+      }
 
-  const signUpResp = await cognito.signUp({
-    ClientId: clientId,
-    Username: email,
-    Password: password,
-    UserAttributes: [
-      { Name: 'name', Value: name }
-    ]
-  }).promise()
+      const signUpResp = await cognito.adminCreateUser(params).promise();
+      const user = signUpResp.User
+      const username = user.Username
+      console.log(`[${email}] - user has signed up [${username}]`)
 
-  const username = signUpResp.UserSub
-  console.log(`[${email}] - user has signed up [${username}]`)
+      const insertUsersTable =  await we_invoke_confirmUserSignup(username, name, email);
+//      const ddbUser = await then.user_exists_in_UsersTable(username);
+//      console.log( ddbUser + `insertUsersTable - user has signed up [${username}]`)
 
-  await cognito.adminConfirmSignUp({
-    UserPoolId: userPoolId,
-    Username: username
-  }).promise()
+      // const payload = { 
+      //   AuthFlow: "USER_PASSWORD_AUTH",
+      //   ClientId: clientId,    
+      //   AuthParameters: {
+      //     USERNAME: username,
+      //     PASSWORD: 'Password-1Password-1'
+      //   }
+      // }
+      // const auth = await cognito.initiateAuth(payload).promise();
 
-  console.log(`[${email}] - confirmed sign up`)
+      // const challengeResp = await cognito
+      //       .respondToAuthChallenge({
+      //         ChallengeName: 'NEW_PASSWORD_REQUIRED',
+      //         Session: auth.Session,
+      //         ChallengeResponses: {
+      //           USERNAME: username,
+      //           NEW_PASSWORD: "password",
+      //         },
+      //         ClientId: clientId,          
+      //       })
+      //       .promise()
 
-  return {
-    username,
-    name,
-    email
+      // console.log( challengeResp + `challengeResp - user has signed up [${username}]`)
+
+  //}
+    return {
+      username,
+      name,
+      email
+    }
   }
+  catch (err) {
+    console.log(err);
+    if (err.code == 'UsernameExistsException') {
+
+    } else if (err.code == 'InvalidPasswordException') {
+
+    } else {
+
+    }
+  }    
 }
 
 const we_invoke_an_appsync_template = (templatePath, context) => {

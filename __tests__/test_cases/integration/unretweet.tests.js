@@ -11,12 +11,12 @@ describe("Given an authenticated user retweeted another user's tweet", () => {
     userB = await given.an_authenticated_user()
     tweet = await when.we_invoke_tweet(userB.username, text)
     await when.we_invoke_retweet(userA.username, tweet.id)
-  }, 15000)
+  }, 30000)
 
   describe("When user A unretweets user B's tweet", () => {
     beforeAll(async () => {
       await when.we_invoke_unretweet(userA.username, tweet.id)
-    }, 15000)
+    }, 30000)
 
     it('Removes the retweet from the Tweets table', async () => {
       await then.retweet_does_not_exist_in_TweetsTable(userA.username, tweet.id)

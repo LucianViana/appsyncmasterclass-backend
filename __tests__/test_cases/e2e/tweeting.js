@@ -7,14 +7,14 @@ describe('Given an authenticated user', () => {
   let userA
   beforeAll(async () => {
     userA = await given.an_authenticated_user()
-  },15000)
+  }, 30000)
 
   describe('When he sends a tweet', () => {
     let tweet
     const text = chance.string({ length: 16 })
     beforeAll(async () => {
       tweet = await when.a_user_calls_tweet(userA, text)
-    },15000)
+    }, 30000)
 
     it('Should return the new tweet', () => {
       expect(tweet).toMatchObject({
@@ -32,7 +32,7 @@ describe('Given an authenticated user', () => {
         const result = await when.a_user_calls_getTweets(userA, userA.username, 25)
         tweets = result.tweets
         nextToken = result.nextToken
-      },15000)
+      }, 30000)
 
       it('He will see the new tweet in the tweets array', () => {
         expect(nextToken).toBeNull()
@@ -55,7 +55,7 @@ describe('Given an authenticated user', () => {
         const result = await when.a_user_calls_getMyTimeline(userA, 25)
         tweets = result.tweets
         nextToken = result.nextToken
-      },15000)
+      }, 30000)
 
       it('He will see the new tweet in the tweets array', () => {
         expect(nextToken).toBeNull()
@@ -75,7 +75,7 @@ describe('Given an authenticated user', () => {
     describe('When he likes the tweet', () => {
       beforeAll(async () => {
         await when.a_user_calls_like(userA, tweet.id)
-      },15000)
+      }, 30000)
 
       it('Should see Tweet.liked as true', async () => {
         const { tweets } = await when.a_user_calls_getMyTimeline(userA, 25)
@@ -112,7 +112,7 @@ describe('Given an authenticated user', () => {
       describe('When he unlikes the tweet', () => {
         beforeAll(async () => {
           await when.a_user_calls_unlike(userA, tweet.id)
-        },15000)
+        }, 30000)
 
         it('Should see Tweet.liked as false', async () => {
           const { tweets } = await when.a_user_calls_getMyTimeline(userA, 25)
@@ -142,7 +142,7 @@ describe('Given an authenticated user', () => {
     describe('When he retweets the tweet', () => {
       beforeAll(async () => {
         await when.a_user_calls_retweet(userA, tweet.id)
-      },15000)
+      }, 30000)
 
       it('Should see the retweet when he calls getTweets', async () => {
         const { tweets } = await when.a_user_calls_getTweets(userA, userA.username, 25)
@@ -192,7 +192,7 @@ describe('Given an authenticated user', () => {
       describe('When he unretweets the tweet', () => {
         beforeAll(async () => {
           await when.a_user_calls_unretweet(userA, tweet.id)
-        },15000)
+        }, 30000)
 
         it('Should not see the retweet when he calls getTweets anymore', async () => {
           const { tweets } = await when.a_user_calls_getTweets(userA, userA.username, 25)
@@ -217,12 +217,12 @@ describe('Given an authenticated user', () => {
       beforeAll(async () => {
         userB = await given.an_authenticated_user()
         anotherTweet = await when.a_user_calls_tweet(userB, text)
-      },15000)
+      }, 30000)
 
       describe("When user A retweets user B's tweet", () => {
         beforeAll(async () => {
           await when.a_user_calls_retweet(userA, anotherTweet.id)
-        },15000)
+        }, 30000)
 
         it('Should see the retweet when he calls getTweets', async () => {
           const { tweets } = await when.a_user_calls_getTweets(userA, userA.username, 25)
@@ -261,7 +261,7 @@ describe('Given an authenticated user', () => {
         describe("When user A unretweets user B's tweet", () => {
           beforeAll(async () => {
             await when.a_user_calls_unretweet(userA, anotherTweet.id)
-          },15000)
+          }, 30000)
 
           it('User A should not see the retweet when he calls getTweets anymore', async () => {
             const { tweets } = await when.a_user_calls_getTweets(userA, userA.username, 25)

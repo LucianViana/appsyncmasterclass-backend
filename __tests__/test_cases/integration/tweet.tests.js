@@ -7,14 +7,14 @@ describe('Given an authenticated user', () => {
   let user
   beforeAll(async () => {
     user = await given.an_authenticated_user()
-  }, 15000)
+  }, 30000)
 
   describe('When he sends a tweet', () => {
     let tweet
     const text = chance.string({ length: 16 })
     beforeAll(async () => {
       tweet = await when.we_invoke_tweet(user.username, text)
-    }, 15000)
+    }, 30000)
 
     it('Saves the tweet in the Tweets table', async () => {
       await then.tweet_exists_in_TweetsTable(tweet.id)

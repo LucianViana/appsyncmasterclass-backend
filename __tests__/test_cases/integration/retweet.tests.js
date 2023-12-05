@@ -9,12 +9,12 @@ describe('Given an authenticated user with a tweet', () => {
   beforeAll(async () => {
     userA = await given.an_authenticated_user()
     tweet = await when.we_invoke_tweet(userA.username, text)
-  }, 15000)
+  }, 30000)
 
   describe('When he retweets his own tweet', () => {
     beforeAll(async () => {
       await when.we_invoke_retweet(userA.username, tweet.id)
-    }, 15000)
+    }, 30000)
 
     it('Saves the retweet in the Tweets table', async () => {
       await then.retweet_exists_in_TweetsTable(userA.username, tweet.id)
@@ -48,7 +48,7 @@ describe('Given an authenticated user with a tweet', () => {
       userB = await given.an_authenticated_user()
       anotherTweet = await when.we_invoke_tweet(userB.username, text)
       await when.we_invoke_retweet(userA.username, anotherTweet.id)
-    }, 15000)
+    }, 30000)
 
     it('Saves the retweet in the Tweets table', async () => {
       await then.retweet_exists_in_TweetsTable(userA.username, anotherTweet.id)

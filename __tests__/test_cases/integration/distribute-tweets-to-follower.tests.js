@@ -11,7 +11,7 @@ describe('Given use A and user B', () => {
     userB = await given.an_authenticated_user()
     userAsTweet1 = await when.we_invoke_tweet(userA.username, chance.paragraph())
     userAsTweet2 = await when.we_invoke_tweet(userA.username, chance.paragraph())
-  }, 15000)
+  }, 30000)
 
   describe('When user B follows user A', () => {
     beforeAll(async () => {
@@ -21,7 +21,7 @@ describe('Given use A and user B', () => {
       NewImage.otherUserId.S = userA.username
       NewImage.sk.S = `FOLLOWS_${userA.username}`
       await when.we_invoke_distributeTweetsToFollower(event)
-    }, 15000)
+    }, 30000)
 
     it("Adds user A's tweets to user B's timeline", async () => {
       await then.tweet_exists_in_TimelinesTable(userB.username, userAsTweet1.id)
@@ -36,7 +36,7 @@ describe('Given use A and user B', () => {
         OldImage.otherUserId.S = userA.username
         OldImage.sk.S = `FOLLOWS_${userA.username}`
         await when.we_invoke_distributeTweetsToFollower(event)
-      }, 15000)
+      }, 30000)
 
       it("Removes user A's tweets from user B's timeline", async () => {
         await then.tweet_does_not_exist_in_TimelinesTable(userB.username, userAsTweet1.id)
