@@ -1,5 +1,12 @@
-const DynamoDB = require('aws-sdk/clients/dynamodb')
-const DocumentClient = new DynamoDB.DocumentClient()
+const {
+  DynamoDBDocument,
+} = require('@aws-sdk/lib-dynamodb');
+
+const {
+  DynamoDB,
+} = require('@aws-sdk/client-dynamodb');
+
+const DocumentClient = DynamoDBDocument.from(new DynamoDB())
 const ulid = require('ulid')
 const { TweetTypes } = require('../lib/constants')
 
@@ -16,7 +23,7 @@ module.exports.handler = async (event) => {
     Key: {
       id: tweetId
     }
-  }).promise()
+  })
 
   const tweet = getTweetResp.Item
   if (!tweet) {
@@ -89,7 +96,7 @@ module.exports.handler = async (event) => {
 
   await DocumentClient.transactWrite({
     TransactItems: transactItems
-  }).promise()
+  })
 
   return newTweet
 }

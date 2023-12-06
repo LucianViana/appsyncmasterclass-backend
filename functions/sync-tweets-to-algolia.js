@@ -1,4 +1,3 @@
-const DynamoDB = require('aws-sdk/clients/dynamodb')
 const middy = require('@middy/core')
 const ssm = require('@middy/ssm')
 const { initTweetsIndex } = require('../lib/algolia')

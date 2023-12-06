@@ -1,4 +1,3 @@
-const DynamoDB = require('aws-sdk/clients/dynamodb')
 const graphql = require('graphql-tag')
 const { mutate } = require('../lib/graphql')
 const ulid = require('ulid')

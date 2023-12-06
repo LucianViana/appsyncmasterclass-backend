@@ -1,6 +1,14 @@
 const _ = require('lodash')
-const DynamoDB = require('aws-sdk/clients/dynamodb')
-const DocumentClient = new DynamoDB.DocumentClient()
+
+const {
+  DynamoDBDocument
+} = require('@aws-sdk/lib-dynamodb');
+
+const {
+  DynamoDB
+} = require('@aws-sdk/client-dynamodb');
+
+const DocumentClient = DynamoDBDocument.from(new DynamoDB())
 
 const { USERS_TABLE, TIMELINES_TABLE, TWEETS_TABLE, RETWEETS_TABLE } = process.env
 
@@ -13,7 +21,7 @@ module.exports.handler = async (event) => {
     Key: {
       id: tweetId
     }
-  }).promise()
+  })
 
   const tweet = getTweetResp.Item
   if (!tweet) {
@@ -29,7 +37,7 @@ module.exports.handler = async (event) => {
       ':tweetId': tweetId
     },
     Limit: 1
-  }).promise()
+  })
 
   const retweet = _.get(queryResp, 'Items.0')
   
@@ -95,7 +103,7 @@ module.exports.handler = async (event) => {
 
   await DocumentClient.transactWrite({
     TransactItems: transactItems
-  }).promise()
+  })
 
   return true
 }

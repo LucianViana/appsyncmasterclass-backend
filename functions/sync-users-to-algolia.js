@@ -1,4 +1,3 @@
-const DynamoDB = require('aws-sdk/clients/dynamodb')
 const { initUsersIndex } = require('../lib/algolia')
 const middy = require('@middy/core')
 const ssm = require('@middy/ssm')

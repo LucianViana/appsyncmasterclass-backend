@@ -1,6 +1,14 @@
 const _ = require('lodash')
-const DynamoDB = require('aws-sdk/clients/dynamodb')
-const DocumentClient = new DynamoDB.DocumentClient()
+
+const {
+  DynamoDBDocument
+} = require('@aws-sdk/lib-dynamodb');
+
+const {
+  DynamoDB
+} = require('@aws-sdk/client-dynamodb');
+
+const DocumentClient = DynamoDBDocument.from(new DynamoDB())
 const Constants = require('../lib/constants')
 
 const { RELATIONSHIPS_TABLE, TIMELINES_TABLE } = process.env
@@ -30,7 +38,7 @@ async function getFollowers(userId) {
       },
       IndexName: 'byOtherUser',
       ExclusiveStartKey: exclusiveStartKey
-    }).promise()
+    })
   
     const userIds = (resp.Items || []).map(x => x.userId)
 
@@ -66,7 +74,7 @@ async function distribute(tweet, followers) {
       RequestItems: {
         [TIMELINES_TABLE]: chunk
       }
-    }).promise()
+    })
   })
 
   await Promise.all(promises)
@@ -89,7 +97,7 @@ async function undistribute(tweet, followers) {
       RequestItems: {
         [TIMELINES_TABLE]: chunk
       }
-    }).promise()
+    })
   })
 
   await Promise.all(promises)

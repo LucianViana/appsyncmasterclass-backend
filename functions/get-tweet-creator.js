@@ -1,7 +1,15 @@
 const _ = require('lodash')
 const XRay = require('aws-xray-sdk-core')
-const DynamoDB = require('aws-sdk/clients/dynamodb')
-const DocumentClient = new DynamoDB.DocumentClient()
+
+const {
+  DynamoDBDocument
+} = require('@aws-sdk/lib-dynamodb');
+
+const {
+  DynamoDB
+} = require('@aws-sdk/client-dynamodb');
+
+const DocumentClient = DynamoDBDocument.from(new DynamoDB())
 XRay.captureAWSClient(DocumentClient.service)
 
 const { USERS_TABLE } = process.env
@@ -25,7 +33,7 @@ module.exports.handler = async (payloads) => {
         Keys: uniqUserIds.map(x => ({ id: x }))
       }
     }
-  }).promise()
+  })
 
   const users = resp.Responses[USERS_TABLE]
   users.forEach(user => {

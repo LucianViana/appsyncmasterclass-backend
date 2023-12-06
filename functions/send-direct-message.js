@@ -1,5 +1,12 @@
-const DynamoDB = require('aws-sdk/clients/dynamodb')
-const DocumentClient = new DynamoDB.DocumentClient()
+const {
+  DynamoDBDocument,
+} = require('@aws-sdk/lib-dynamodb');
+
+const {
+  DynamoDB,
+} = require('@aws-sdk/client-dynamodb');
+
+const DocumentClient = DynamoDBDocument.from(new DynamoDB())
 const ulid = require('ulid')
 
 const { CONVERSATIONS_TABLE, DIRECT_MESSAGES_TABLE } = process.env
@@ -54,7 +61,7 @@ module.exports.handler = async (event) => {
         }
       }
     }]
-  }).promise()
+  })
 
   return {
     id: conversationId,

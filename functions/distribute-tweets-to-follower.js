@@ -1,6 +1,14 @@
 const _ = require('lodash')
-const DynamoDB = require('aws-sdk/clients/dynamodb')
-const DocumentClient = new DynamoDB.DocumentClient()
+
+const {
+  DynamoDBDocument,
+} = require('@aws-sdk/lib-dynamodb');
+
+const {
+  DynamoDB,
+} = require('@aws-sdk/client-dynamodb');
+
+const DocumentClient = DynamoDBDocument.from(new DynamoDB())
 const Constants = require('../lib/constants')
 
 const { TWEETS_TABLE, TIMELINES_TABLE, MAX_TWEETS } = process.env
@@ -38,7 +46,7 @@ async function getTweets(userId) {
       },
       IndexName: 'byCreator',
       ExclusiveStartKey: exclusiveStartKey
-    }).promise()
+    })
   
     const tweets = resp.Items || []
     const newAcc = acc.concat(tweets)
@@ -64,7 +72,7 @@ async function getTimelineEntriesBy(distributedFrom, userId) {
       },
       IndexName: 'byDistributedFrom',
       ExclusiveStartKey: exclusiveStartKey
-    }).promise()
+    })
   
     const tweets = resp.Items || []
     const newAcc = acc.concat(tweets)
@@ -101,7 +109,7 @@ async function distribute(tweets, userId) {
       RequestItems: {
         [TIMELINES_TABLE]: chunk
       }
-    }).promise()
+    })
   })
 
   await Promise.all(promises)
@@ -124,7 +132,7 @@ async function undistribute(tweets, userId) {
       RequestItems: {
         [TIMELINES_TABLE]: chunk
       }
-    }).promise()
+    })
   })
 
   await Promise.all(promises)
