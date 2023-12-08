@@ -5,7 +5,7 @@
 describe('When a user signs up', () => {
   it("The user's profile should be saved in DynamoDB", async () => {
     //TODO :NAO ESTA FUNCIONANDO O USER_SIG...
-    const { password, name, email } = given.a_random_user()
+    //const { password, name, email } = given.a_random_user()
 
     //const user = await when.a_user_signs_up(password, name, email)
     //console.log(user.username);
