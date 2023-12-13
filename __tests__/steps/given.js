@@ -6,8 +6,8 @@ const chance = require('chance').Chance()
 const velocityUtil = require('amplify-appsync-simulator/lib/velocity/util')
 
 const { RELATIONSHIPS_TABLE } = process.env
-// const when = require('./when');
-// const then = require('./then');
+const when = require('./when');
+const then = require('./then');
 
 const a_random_user = () => {
   const firstName = chance.first({ nationality: 'en' })
@@ -102,9 +102,9 @@ const an_authenticated_user = async () => {
 
       console.log( challengeResp + `challengeResp - user has signed up [${username}]`)
 
-      // const insertUsersTable =  await when.we_invoke_confirmUserSignup(username, name, email);
-      // const ddbUser = await then.user_exists_in_UsersTable(username);
-      // console.log( ddbUser + `insertUsersTable - user has signed up [${username}]`)
+      const insertUsersTable =  await when.we_invoke_confirmUserSignup(username, name, email);
+      const ddbUser = await then.user_exists_in_UsersTable(username);
+       console.log( ddbUser + `insertUsersTable - user has signed up [${username}]`)
             
     return {
       username,

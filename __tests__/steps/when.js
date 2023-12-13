@@ -371,7 +371,7 @@ const a_user_signs_up = async (password, name, email) => {
       const username = user.Username
       console.log(`[${email}] - user has signed up [${username}]`)
 
-      const insertUsersTable =  await we_invoke_confirmUserSignup(username, name, email);
+//      const insertUsersTable =  await we_invoke_confirmUserSignup(username, name, email);
 //      const ddbUser = await then.user_exists_in_UsersTable(username);
 //      console.log( ddbUser + `insertUsersTable - user has signed up [${username}]`)
 
