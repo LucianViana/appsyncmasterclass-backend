@@ -2,11 +2,11 @@ const graphql = require('graphql-tag')
 const { mutate } = require('../lib/graphql')
 const ulid = require('ulid')
 const { getTweetById } = require('../lib/tweets')
-
+const { unmarshall } = require("@aws-sdk/util-dynamodb");
 module.exports.handler = async (event) => {
   for (const record of event.Records) {
     if (record.eventName === 'INSERT') {
-      const like = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage)
+      const like = unmarshall(record.dynamodb.NewImage)
       await notifyLiked(like)
     }
   }

@@ -4,14 +4,14 @@ const { initTweetsIndex } = require('../lib/algolia')
 const { TweetTypes } = require('../lib/constants')
 
 const { STAGE } = process.env
-
+const { unmarshall } = require("@aws-sdk/util-dynamodb");
 module.exports.handler = middy(async (event, context) => {
   const index = await initTweetsIndex(
     context.ALGOLIA_APP_ID, context.ALGOLIA_WRITE_KEY, STAGE)
 
   for (const record of event.Records) {
     if (record.eventName === 'INSERT' || record.eventName === 'MODIFY') {
-      const tweet = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage)
+      const tweet = unmarshall(record.dynamodb.NewImage)
 
       if (tweet.__typename === TweetTypes.RETWEET) {
         continue
@@ -21,7 +21,7 @@ module.exports.handler = middy(async (event, context) => {
 
       await index.saveObjects([tweet])
     } else if (record.eventName === 'REMOVE') {
-      const tweet = DynamoDB.Converter.unmarshall(record.dynamodb.OldImage)
+      const tweet = unmarshall(record.dynamodb.OldImage)
 
       if (tweet.__typename === TweetTypes.RETWEET) {
         continue

@@ -7,6 +7,7 @@ const {
 const {
   DynamoDB,
 } = require('@aws-sdk/client-dynamodb');
+const { unmarshall } = require("@aws-sdk/util-dynamodb");
 
 const DocumentClient = DynamoDBDocument.from(new DynamoDB())
 const Constants = require('../lib/constants')
@@ -17,7 +18,7 @@ const MaxTweets = parseInt(MAX_TWEETS)
 module.exports.handler = async (event) => {
   for (const record of event.Records) {
     if (record.eventName === 'INSERT') {
-      const relationship = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage)
+      const relationship = unmarshall(record.dynamodb.NewImage)
 
       const [relType] = relationship.sk.split('_')
       if (relType === 'FOLLOWS') {
@@ -25,7 +26,7 @@ module.exports.handler = async (event) => {
         await distribute(tweets, relationship.userId)
       }
     } else if (record.eventName === 'REMOVE') {
-      const relationship = DynamoDB.Converter.unmarshall(record.dynamodb.OldImage)
+      const relationship = unmarshall(record.dynamodb.OldImage)
 
       const [relType] = relationship.sk.split('_')
       if (relType === 'FOLLOWS') {

@@ -7,7 +7,7 @@ const {
 const {
   DynamoDB
 } = require('@aws-sdk/client-dynamodb');
-
+const { unmarshall } = require("@aws-sdk/util-dynamodb");
 const DocumentClient = DynamoDBDocument.from(new DynamoDB())
 const Constants = require('../lib/constants')
 
@@ -16,11 +16,11 @@ const { RELATIONSHIPS_TABLE, TIMELINES_TABLE } = process.env
 module.exports.handler = async (event) => {
   for (const record of event.Records) {
     if (record.eventName === 'INSERT') {
-      const tweet = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage)
+      const tweet = unmarshall(record.dynamodb.NewImage)
       const followers = await getFollowers(tweet.creator)
       await distribute(tweet, followers)
     } else if (record.eventName === 'REMOVE') {
-      const tweet = DynamoDB.Converter.unmarshall(record.dynamodb.OldImage)
+      const tweet = unmarshall(record.dynamodb.OldImage)
       const followers = await getFollowers(tweet.creator)
       await undistribute(tweet, followers)
     }

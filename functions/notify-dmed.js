@@ -1,11 +1,11 @@
 const graphql = require('graphql-tag')
 const { mutate } = require('../lib/graphql')
 const ulid = require('ulid')
-
+const { unmarshall } = require("@aws-sdk/util-dynamodb");
 module.exports.handler = async (event) => {
   for (const record of event.Records) {
     if (record.eventName === 'INSERT') {
-      const dm = DynamoDB.Converter.unmarshall(record.dynamodb.NewImage)
+      const dm = unmarshall(record.dynamodb.NewImage)
       await notifyDMed(dm)
     }
   }
