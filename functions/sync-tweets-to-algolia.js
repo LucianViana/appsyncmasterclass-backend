@@ -6,30 +6,35 @@ const { TweetTypes } = require('../lib/constants')
 const { STAGE } = process.env
 const { unmarshall } = require("@aws-sdk/util-dynamodb");
 module.exports.handler = middy(async (event, context) => {
-  const index = await initTweetsIndex(
-    context.ALGOLIA_APP_ID, context.ALGOLIA_WRITE_KEY, STAGE)
+  try {  
+    const index = await initTweetsIndex(
+      context.ALGOLIA_APP_ID, context.ALGOLIA_WRITE_KEY, STAGE)
 
-  for (const record of event.Records) {
-    if (record.eventName === 'INSERT' || record.eventName === 'MODIFY') {
-      const tweet = unmarshall(record.dynamodb.NewImage)
+    for (const record of event.Records) {
+      if (record.eventName === 'INSERT' || record.eventName === 'MODIFY') {
+        const tweet = unmarshall(record.dynamodb.NewImage)
 
-      if (tweet.__typename === TweetTypes.RETWEET) {
-        continue
+        if (tweet.__typename === TweetTypes.RETWEET) {
+          continue
+        }
+        
+        tweet.objectID = tweet.id
+
+        await index.saveObjects([tweet])
+      } else if (record.eventName === 'REMOVE') {
+        const tweet = unmarshall(record.dynamodb.OldImage)
+
+        if (tweet.__typename === TweetTypes.RETWEET) {
+          continue
+        }
+
+        await index.deleteObjects([tweet.id])
       }
-      
-      tweet.objectID = tweet.id
-
-      await index.saveObjects([tweet])
-    } else if (record.eventName === 'REMOVE') {
-      const tweet = unmarshall(record.dynamodb.OldImage)
-
-      if (tweet.__typename === TweetTypes.RETWEET) {
-        continue
-      }
-
-      await index.deleteObjects([tweet.id])
     }
   }
+  catch (err) {
+    console.log(err);
+  }    
 }).use(ssm({
   cache: true,
   cacheExpiryInMillis: 5 * 60 * 1000, // 5 mins

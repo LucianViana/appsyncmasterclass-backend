@@ -193,7 +193,7 @@ functions:
 
   syncUsersToAlgolia:
     handler: functions/sync-users-to-algolia.handler
-    iamRoleStatementsName: sync-users-to-algolia                      
+    iamRoleStatementsName: ${self:service}-${self:custom.stage}-syncUsersToAlgolia                      
     events:
       - stream:
           type: dynamodb
@@ -207,11 +207,29 @@ functions:
 
   syncTweetsToAlgolia:
     handler: functions/sync-tweets-to-algolia.handler
-    iamRoleStatementsName: sync-tweets-to-algolia                      
+    iamRoleStatementsName: ${self:service}-${self:custom.stage}-syncTweetsToAlgolia                      
     events:
       - stream:
           type: dynamodb
           arn: !GetAtt TweetsTable.StreamArn
+    iamRoleStatements:
+      - Effect: Allow
+        Action: ssm:GetParameters
+        Resource:
+          - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.stage}/algolia-app-id
+          - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.stage}/algolia-admin-key
+
+  search:
+    handler: functions/search.handler
+    iamRoleStatements:
+      - Effect: Allow
+        Action: ssm:GetParameters
+        Resource:
+          - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.stage}/algolia-app-id
+          - !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.stage}/algolia-admin-key
+
+  getHashTag:
+    handler: functions/get-hash-tag.handler
     iamRoleStatements:
       - Effect: Allow
         Action: ssm:GetParameters

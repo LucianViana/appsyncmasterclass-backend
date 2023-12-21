@@ -7,9 +7,10 @@
   "scripts": {
     "sls": "sls",
     "exportEnv": "sls export-env && sls manifest",
+    "jest": "jest -- __tests__/test_cases/e2e/search.js",
     "test": "jest --verbose ./__tests__/test_cases/unit --silent",
     "integration-test": "jest --verbose ./__tests__/test_cases/integration --silent",
-    "e2e-test": "jest --verbose ./__tests__/test_cases/e2e"
+    "e2e-test": "jest --verbose ./__tests__/test_cases/e2e --silent"
   },
   "repository": {
     "type": "git",
@@ -36,7 +37,8 @@
     "serverless-appsync-plugin": "^1.4.0",
     "serverless-export-env": "^1.4.0",
     "serverless-iam-roles-per-function": "^2.0.2",
-    "serverless-manifest-plugin": "^1.0.7"
+    "serverless-manifest-plugin": "^1.0.7",
+    "aws-sdk-js-codemod": "^1.0.0"    
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.476.0",
