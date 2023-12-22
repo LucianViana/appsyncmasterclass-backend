@@ -1,6 +1,18 @@
 const AWS = require('aws-sdk')
+
+const {
+  DynamoDBDocument,
+} = require('@aws-sdk/lib-dynamodb');
+
+const {
+  DynamoDB,
+} = require('@aws-sdk/client-dynamodb');
+
+// JS SDK v3 does not support global configuration.
+// Codemod has attempted to pass values to each service client in this file.
+// You may need to update clients outside of this file, if they use global config.
 AWS.config.region = 'eu-west-1'
-const DynamoDB = new AWS.DynamoDB.DocumentClient()
+const DynamoDB = DynamoDBDocument.from(new DynamoDB())
 
 const { resolve } = require('path')
 require('dotenv').config({
@@ -13,7 +25,7 @@ const run = async () => {
       TableName: process.env.TWEETS_TABLE,
       ExclusiveStartKey: exclusiveStartKey,
       Limit: 100
-    }).promise()
+    })
 
     const promises = resp.Items.map(async x => {
       await DynamoDB.update({
@@ -25,7 +37,7 @@ const run = async () => {
         ExpressionAttributeValues: {
           ":now": new Date().toJSON()
         }
-      }).promise()
+      })
     })
     await Promise.all(promises)
 

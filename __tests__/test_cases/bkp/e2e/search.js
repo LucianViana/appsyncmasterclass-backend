@@ -1,4 +1,3 @@
-require('dotenv').config()
 const given = require('../../steps/given')
 const when = require('../../steps/when')
 const { SearchModes, TweetTypes } = require('../../../lib/constants')
@@ -8,14 +7,9 @@ const chance = require('chance').Chance()
 describe('Given an authenticated user', () => {
   let userA, userAsProfile
   beforeAll(async () => {   
-    try {    
-      userA = await given.an_authenticated_user()
-      userAsProfile = await when.a_user_calls_getMyProfile(userA)
-    }  
-    catch (err) {
-      console.log(err);
-    }      
-  }, 30000)
+    userA = await given.an_authenticated_user()
+    userAsProfile = await when.a_user_calls_getMyProfile(userA)
+  })
 
   it('The user can find himself when he searches for his twitter handle', async () => {
     await retry(async () => {

@@ -5,14 +5,14 @@ const {
 } = require('@aws-sdk/lib-dynamodb');
 
 const {
-  DynamoDBSDK,
+  DocumentClient,
 } = require('@aws-sdk/client-dynamodb');
 
 // JS SDK v3 does not support global configuration.
 // Codemod has attempted to pass values to each service client in this file.
 // You may need to update clients outside of this file, if they use global config.
 AWS.config.region = 'eu-west-1'
-const DynamoDB = DynamoDBDocument.from(new DynamoDBSDK())
+const DynamoDB = DynamoDBDocument.from(new DocumentClient())
 
 const { resolve } = require('path')
 require('dotenv').config({
