@@ -1,3 +1,4 @@
+/******NAO FUNCIONA COM CODIGO AWS-SDK V3 ESTUDAR******/
 const AWS = require('aws-sdk')
 
 const {

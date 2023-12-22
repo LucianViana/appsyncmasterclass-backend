@@ -1,4 +1,5 @@
 require('dotenv').config()
+/******NAO FUNCIONA COM CODIGO AWS-SDK V3 ESTUDAR******/
 const AWS = require('aws-sdk')
 const fs = require('fs')
 const velocityMapper = require('amplify-appsync-simulator/lib/velocity/value-mapper/mapper')

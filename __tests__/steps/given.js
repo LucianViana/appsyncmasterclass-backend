@@ -1,4 +1,5 @@
 require('dotenv').config()
+/******NAO FUNCIONA COM CODIGO AWS-SDK V3 ESTUDAR******/
 const AWS = require('aws-sdk')
 require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 const DocumentClient = new AWS.DynamoDB.DocumentClient()

@@ -1,4 +1,5 @@
 require('dotenv').config()
+/******NAO FUNCIONA COM CODIGO AWS-SDK V3 ESTUDAR******/
 const AWS = require('aws-sdk')
 
 const providerName = process.env.COGNITO_USER_POOL_PROVIDER_NAME
