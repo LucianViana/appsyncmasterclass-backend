@@ -5,8 +5,14 @@ userPoolConfig:
   awsRegion: eu-west-1
   defaultAction: ALLOW
   userPoolId: !Ref CognitoUserPool
+additionalAuthenticationProviders:
+  - authenticationType: AWS_IAM
 mappingTemplatesLocation: mapping-templates
 mappingTemplates:
+  - type: Subscription
+    field: onNotified
+    dataSource: none
+    
   - type: Query
     field: getMyProfile
     dataSource: usersTable
@@ -89,6 +95,12 @@ mappingTemplates:
   - type: Mutation
     field: unfollow
     dataSource: unfollowMutation
+  - type: Mutation
+    field: notifyRetweeted
+    dataSource: notificationsTable
+  - type: Mutation
+    field: notifyReplied
+    dataSource: notificationsTable
 
   # NESTED FIELDS
   - type: Tweet
@@ -184,6 +196,10 @@ dataSources:
     name: relationshipsTable
     config:
       tableName: !Ref RelationshipsTable
+  - type: AMAZON_DYNAMODB
+    name: notificationsTable
+    config:
+      tableName: !Ref NotificationsTable
   - type: AMAZON_DYNAMODB
     name: likeMutation
     config:
