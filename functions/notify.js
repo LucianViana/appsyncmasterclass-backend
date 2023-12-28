@@ -1,11 +1,10 @@
-const _ = require('lodash')
+const { unmarshall } = require("@aws-sdk/util-dynamodb");
 const { TweetTypes } = require('../lib/constants')
 const graphql = require('graphql-tag')
 const { mutate } = require('../lib/graphql')
 const ulid = require('ulid')
-const { getTweetById, extractMentions } = require('../lib/tweets')
-const { getUserByScreenName } = require('../lib/users')
-const { unmarshall } = require("@aws-sdk/util-dynamodb");
+const { getTweetById } = require('../lib/tweets')
+
 module.exports.handler = async (event) => {
   for (const record of event.Records) {
     if (record.eventName === 'INSERT') {
@@ -15,16 +14,6 @@ module.exports.handler = async (event) => {
         case TweetTypes.RETWEET:
           await notifyRetweet(tweet)
           break
-        case TweetTypes.REPLY:
-          await notifyReply(tweet.inReplyToUserIds, tweet)
-          break
-      }
-
-      if (tweet.text) {
-        const mentions = extractMentions(tweet.text)
-        if (!_.isEmpty(mentions)) {
-          await notifyMentioned(mentions, tweet)
-        }
       }
     }
   }
@@ -64,83 +53,4 @@ async function notifyRetweet(tweet) {
     retweetId: tweet.id,
     retweetedBy: tweet.creator
   })
-}
-
-async function notifyReply(userIds, tweet) {
-  const promises = userIds.map(userId => 
-    mutate(graphql `mutation notifyReplied(
-      $id: ID!
-      $userId: ID!
-      $tweetId: ID!
-      $replyTweetId: ID!
-      $repliedBy: ID!
-    ) {
-      notifyReplied(
-        id: $id
-        userId: $userId
-        tweetId: $tweetId
-        replyTweetId: $replyTweetId
-        repliedBy: $repliedBy
-      ) {
-        __typename
-        ... on Replied {
-          id
-          type
-          userId
-          tweetId
-          repliedBy
-          replyTweetId
-          createdAt
-        }
-      }
-    }`, {
-      id: ulid.ulid(),
-      userId,
-      tweetId: tweet.inReplyToTweetId,
-      replyTweetId: tweet.id,
-      repliedBy: tweet.creator
-    })
-  )
-
-  await Promise.all(promises)
-}
-
-async function notifyMentioned(screenNames, tweet) {
-  const promises = screenNames.map(async (screenName) => {
-    const user = await getUserByScreenName(screenName.replace('@', ''))
-    if (!user) {
-      return
-    }
-
-    await mutate(graphql `mutation notifyMentioned(
-      $id: ID!
-      $userId: ID!
-      $mentionedBy: ID!
-      $mentionedByTweetId: ID!
-    ) {
-      notifyMentioned(
-        id: $id
-        userId: $userId
-        mentionedBy: $mentionedBy
-        mentionedByTweetId: $mentionedByTweetId
-      ) {
-        __typename
-        ... on Mentioned {
-          id
-          type
-          userId
-          mentionedBy
-          mentionedByTweetId
-          createdAt
-        }
-      }
-    }`, {
-      id: ulid.ulid(),
-      userId: user.id,
-      mentionedBy: tweet.creator,
-      mentionedByTweetId: tweet.id
-    })
-  })
-  
-  await Promise.all(promises)
 }
