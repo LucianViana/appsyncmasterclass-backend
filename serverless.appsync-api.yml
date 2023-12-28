@@ -101,7 +101,12 @@ mappingTemplates:
   - type: Mutation
     field: notifyReplied
     dataSource: notificationsTable
-
+  - type: Mutation
+    field: notifyLiked
+    dataSource: notificationsTable
+  - type: Mutation
+    field: notifyMentioned
+    dataSource: notificationsTable
   # NESTED FIELDS
   - type: Tweet
     field: profile

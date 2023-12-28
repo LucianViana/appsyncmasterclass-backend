@@ -242,10 +242,31 @@ functions:
     environment:
       GRAPHQL_API_URL: !GetAtt AppsyncmasterclassGraphQlApi.GraphQLUrl
       TWEETS_TABLE: !Ref TweetsTable
+      USERS_TABLE: !Ref UsersTable
     events:
       - stream:
           type: dynamodb
           arn: !GetAtt TweetsTable.StreamArn
+    iamRoleStatements:
+      - Effect: Allow
+        Action: appsync:GraphQL
+        Resource: !Sub ${AppsyncmasterclassGraphQlApi.Arn}/*
+      - Effect: Allow
+        Action: dynamodb:GetItem
+        Resource: !GetAtt TweetsTable.Arn
+      - Effect: Allow
+        Action: dynamodb:Query
+        Resource: !Sub ${UsersTable.Arn}/index/byScreenName
+
+  notifyLiked:
+    handler: functions/notify-liked.handler
+    environment:
+      GRAPHQL_API_URL: !GetAtt AppsyncmasterclassGraphQlApi.GraphQLUrl
+      TWEETS_TABLE: !Ref TweetsTable
+    events:
+      - stream:
+          type: dynamodb
+          arn: !GetAtt LikesTable.StreamArn
     iamRoleStatements:
       - Effect: Allow
         Action: appsync:GraphQL
@@ -377,6 +398,8 @@ resources:
             AttributeType: S
           - AttributeName: tweetId
             AttributeType: S
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
         Tags:
           - Key: Environment
             Value: ${self:custom.stage}
