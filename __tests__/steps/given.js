@@ -78,7 +78,6 @@ const an_authenticated_user = async () => {
       const user = signUpResp.User
       const username = user.Username
       console.log(`[${email}] - user has signed up [${username}]`)
-
       const payload = { 
         AuthFlow: "USER_PASSWORD_AUTH",
         ClientId: clientId,    

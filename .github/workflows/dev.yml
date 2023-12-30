@@ -1,4 +1,4 @@
-name: deploy dev
+name: deploy dev-yan10
 
 on:
   push:
@@ -53,7 +53,7 @@ jobs:
         npm run exportEnv
         
         npm run integration-test
-    - name: deploy to dev
+    - name: deploy to dev-yan10
       run: |
         CREDS=`aws sts assume-role --role-arn arn:aws:iam::${{ secrets.DEV_ACCOUNT_ID }}:role/ci-role --role-session-name=ci_user`
         export AWS_ACCESS_KEY_ID=`echo $CREDS | jq -r '.Credentials.AccessKeyId'`

@@ -12,7 +12,7 @@ mappingTemplates:
   - type: Subscription
     field: onNotified
     dataSource: none
-    
+
   - type: Query
     field: getMyProfile
     dataSource: usersTable
@@ -107,6 +107,12 @@ mappingTemplates:
   - type: Mutation
     field: notifyMentioned
     dataSource: notificationsTable
+  - type: Mutation
+    field: sendDirectMessage
+    dataSource: sendDirectMessageFunction
+    request: false
+    response: false
+
   # NESTED FIELDS
   - type: Tweet
     field: profile
@@ -206,6 +212,14 @@ dataSources:
     config:
       tableName: !Ref NotificationsTable
   - type: AMAZON_DYNAMODB
+    name: conversationsTable
+    config:
+      tableName: !Ref ConversationsTable
+  - type: AMAZON_DYNAMODB
+    name: directMessagesTable
+    config:
+      tableName: !Ref DirectMessagesTable
+  - type: AMAZON_DYNAMODB
     name: likeMutation
     config:
       tableName: !Ref LikesTable
@@ -281,6 +295,10 @@ dataSources:
     name: getHashTagFunction
     config:
       functionName: getHashTag
+  - type: AWS_LAMBDA
+    name: sendDirectMessageFunction
+    config:
+      functionName: sendDirectMessage
 
 substitutions:
   TweetsTable: !Ref TweetsTable

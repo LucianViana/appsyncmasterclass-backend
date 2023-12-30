@@ -5,7 +5,6 @@ plugins:
   - serverless-appsync-plugin
   - serverless-iam-roles-per-function
   - serverless-export-env
-  - serverless-manifest-plugin
 
 provider:
   name: aws
@@ -20,18 +19,18 @@ package:
   exclude:
     - package-lock.json
     - package.json
-
+  excludeDevDependencies: true
 custom:
   region: ${opt:region, self:provider.region}
   stage: ${opt:stage, self:provider.stage}
   appSync:
     - ${file(serverless.appsync-api.yml)}
 
-  manifest:
-    postProcess: ./processManifest.js
-    disablePostDeployGeneration: true
-    disableOutput: true
-    silent: true
+  # TODO: NÃO CONSEGUI USAR O SERVERLESS-LAYER NEM NO NODE V14 OU NO V18 :
+  #       NODE 18: Error: EMFILE: too many open files, open 'C: 
+  #       NODE 14: "TypeError: fs.rmSync
+  #serverless-layers:
+  #  layersDeploymentBucket: ${ssm:/appsyncmasterclass/${self:custom.stage}/layer-deployment-bucket}
 
 functions:
   confirmUserSignup:
@@ -275,6 +274,21 @@ functions:
         Action: dynamodb:GetItem
         Resource: !GetAtt TweetsTable.Arn
 
+  sendDirectMessage:
+    handler: functions/send-direct-message.handler
+    iamRoleStatementsName: sendDirectMessage     
+    environment:
+      CONVERSATIONS_TABLE: !Ref ConversationsTable
+      DIRECT_MESSAGES_TABLE: !Ref DirectMessagesTable
+    iamRoleStatements:
+    
+      - Effect: Allow
+        Action: dynamodb:PutItem
+        Resource: !GetAtt DirectMessagesTable.Arn
+      - Effect: Allow
+        Action: dynamodb:UpdateItem
+        Resource: !GetAtt ConversationsTable.Arn
+
 resources:
   Resources:
     UsersTable:
@@ -488,6 +502,59 @@ resources:
           - Key: Name
             Value: notifications-table            
 
+    ConversationsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        BillingMode: PAY_PER_REQUEST
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: otherUserId
+            KeyType: RANGE
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: otherUserId
+            AttributeType: S
+          - AttributeName: lastModified
+            AttributeType: S
+        GlobalSecondaryIndexes:
+          - IndexName: byUserId
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: lastModified
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+        Tags:
+          - Key: Environment
+            Value: ${self:custom.stage}
+          - Key: Name
+            Value: conversations-table  
+           
+    DirectMessagesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        BillingMode: PAY_PER_REQUEST
+        KeySchema:
+          - AttributeName: conversationId
+            KeyType: HASH
+          - AttributeName: messageId
+            KeyType: RANGE
+        AttributeDefinitions:
+          - AttributeName: conversationId
+            AttributeType: S
+          - AttributeName: messageId
+            AttributeType: S
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
+        Tags:
+          - Key: Environment
+            Value: ${self:custom.stage}
+          - Key: Name
+            Value: direct-messages-table  
+
     CognitoUserPool:
       Type: AWS::Cognito::UserPool
       Properties:
@@ -561,3 +628,6 @@ resources:
 
     WebCognitoUserPoolClientId:
       Value: !Ref WebUserPoolClient
+
+    ApiUrl:
+      Value: !GetAtt AppsyncmasterclassGraphQlApi.GraphQLUrl
