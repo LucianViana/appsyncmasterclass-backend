@@ -59,7 +59,10 @@ mappingTemplates:
     dataSource: getHashTagFunction
     request: false
     response: false
-
+  - type: Query
+    field: listConversations
+    dataSource: conversationsTable
+    
   - type: Mutation
     field: editMyProfile
     dataSource: usersTable
@@ -169,6 +172,9 @@ mappingTemplates:
   - type: OtherProfile
     field: followedBy
     dataSource: relationshipsTable
+  - type: Conversation
+    field: otherUser
+    dataSource: usersTable
 
 functionConfigurations:
   - name: getFollowers
