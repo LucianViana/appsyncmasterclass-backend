@@ -1,5 +1,6 @@
 name: appsyncmasterclass
 schema: schema.api.graphql
+caching: ${self:custom.appSyncCaching.${self:custom.stage}, self:custom.appSyncCaching.default}
 authenticationType: AMAZON_COGNITO_USER_POOLS
 userPoolConfig:
   awsRegion: eu-west-1
@@ -19,6 +20,10 @@ mappingTemplates:
   - type: Query
     field: getProfile
     dataSource: usersTable
+    caching:
+      keys:
+        - $context.arguments.screenName
+      ttl: 300
   - type: Query
     field: getImageUploadUrl
     dataSource: getImageUploadUrlFunction
@@ -62,7 +67,10 @@ mappingTemplates:
   - type: Query
     field: listConversations
     dataSource: conversationsTable
-    
+  - type: Query
+    field: getDirectMessages
+    dataSource: directMessagesTable
+
   - type: Mutation
     field: editMyProfile
     dataSource: usersTable
@@ -111,6 +119,9 @@ mappingTemplates:
     field: notifyMentioned
     dataSource: notificationsTable
   - type: Mutation
+    field: notifyDMed
+    dataSource: notificationsTable    
+  - type: Mutation
     field: sendDirectMessage
     dataSource: sendDirectMessageFunction
     request: false
@@ -119,17 +130,34 @@ mappingTemplates:
   # NESTED FIELDS
   - type: Tweet
     field: profile
-    dataSource: usersTable
+    dataSource: getTweetCreatorFunction
+    request: Tweet.profile.batchInvoke.request.vtl
+    response: Tweet.profile.batchInvoke.response.vtl
+    caching:
+      keys:
+        - $context.identity.username
+        - $context.source.creator
+      ttl: 300
   - type: Retweet
     field: profile
-    dataSource: usersTable
-    request: Tweet.profile.request.vtl
-    response: Tweet.profile.response.vtl
+    dataSource: getTweetCreatorFunction
+    request: Tweet.profile.batchInvoke.request.vtl
+    response: Tweet.profile.batchInvoke.response.vtl
+    caching:
+      keys:
+        - $context.identity.username
+        - $context.source.creator
+      ttl: 300
   - type: Reply
     field: profile
-    dataSource: usersTable
-    request: Tweet.profile.request.vtl
-    response: Tweet.profile.response.vtl
+    dataSource: getTweetCreatorFunction
+    request: Tweet.profile.batchInvoke.request.vtl
+    response: Tweet.profile.batchInvoke.response.vtl
+    caching:
+      keys:
+        - $context.identity.username
+        - $context.source.creator
+      ttl: 300
   - type: Tweet
     field: liked
     dataSource: likesTable
@@ -155,6 +183,11 @@ mappingTemplates:
   - type: Reply
     field: inReplyToUsers
     dataSource: usersTable
+    caching:
+      keys:
+        - $context.identity.username
+        - $context.source.inReplyToUserIds
+      ttl: 300
   - type: UnhydratedTweetsPage
     field: tweets
     dataSource: tweetsTable
@@ -174,6 +207,9 @@ mappingTemplates:
     dataSource: relationshipsTable
   - type: Conversation
     field: otherUser
+    dataSource: usersTable
+  - type: Message
+    field: from
     dataSource: usersTable
 
 functionConfigurations:
@@ -305,6 +341,10 @@ dataSources:
     name: sendDirectMessageFunction
     config:
       functionName: sendDirectMessage
+  - type: AWS_LAMBDA
+    name: getTweetCreatorFunction
+    config:
+      functionName: getTweetCreator
 
 substitutions:
   TweetsTable: !Ref TweetsTable

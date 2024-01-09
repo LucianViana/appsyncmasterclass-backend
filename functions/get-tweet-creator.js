@@ -1,5 +1,5 @@
 const _ = require('lodash')
-const XRay = require('aws-xray-sdk-core')
+//const XRay = require('aws-xray-sdk-core')
 
 const {
   DynamoDBDocument
@@ -10,7 +10,8 @@ const {
 } = require('@aws-sdk/client-dynamodb');
 
 const DocumentClient = DynamoDBDocument.from(new DynamoDB())
-XRay.captureAWSClient(DocumentClient.service)
+//TODO : ERRO DA FERRAMENTA SEGUNDO O LINK https://github.com/aws/aws-xray-sdk-node/issues/294
+//XRay.captureAWSClient(DocumentClient.service)
 
 const { USERS_TABLE } = process.env
 

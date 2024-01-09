@@ -100,6 +100,14 @@ type Mutation {
   ): Notification!
   @aws_iam
 
+  notifyDMed(
+    id: ID!
+    userId: ID!
+    otherUserId: ID!
+    message: String!
+  ): Notification!
+  @aws_iam
+
   sendDirectMessage(
     otherUserId: ID!
     message: String!
@@ -108,7 +116,7 @@ type Mutation {
 
 type Subscription {
   onNotified(userId: ID!, type: NotificationType): Notification
-  @aws_subscribe(mutations: ["notifyReplied", "notifyMentioned","notifyLiked","notifyRetweeted"])
+  @aws_subscribe(mutations: ["notifyReplied", "notifyMentioned","notifyLiked","notifyRetweeted","notifyDMed"])
 }
 
 enum SearchMode {
@@ -195,13 +203,13 @@ type OtherProfile implements IProfile {
 
 interface ITweet {
   id: ID!
-  profile: IProfile!
+  profile: IProfile
   createdAt: AWSDateTime!
 }
 
 type Tweet implements ITweet {
   id: ID!
-  profile: IProfile!
+  profile: IProfile
   createdAt: AWSDateTime!
   text: String!
   replies: Int!
@@ -213,7 +221,7 @@ type Tweet implements ITweet {
 
 type Reply implements ITweet {
   id: ID!
-  profile: IProfile!
+  profile: IProfile
   createdAt: AWSDateTime!
   inReplyToTweet: ITweet!
   inReplyToUsers: [IProfile!]
@@ -227,7 +235,7 @@ type Reply implements ITweet {
 
 type Retweet implements ITweet {
   id: ID!
-  profile: IProfile!
+  profile: IProfile
   createdAt: AWSDateTime!
   retweetOf: ITweet!
 }
@@ -299,8 +307,16 @@ type Replied implements iNotification @aws_iam @aws_cognito_user_pools {
   createdAt: AWSDateTime!
 }
 
-union Notification = Retweeted | Liked | Mentioned | Replied
+type DMed implements iNotification @aws_iam @aws_cognito_user_pools {
+  id: ID!
+  type: NotificationType!
+  userId: ID!
+  createdAt: AWSDateTime!
+  otherUserId: ID!
+  message: String!
+}
 
+union Notification = Retweeted | Liked | Mentioned | Replied | DMed
 interface iNotification {
   id: ID!
   type: NotificationType!
@@ -313,6 +329,7 @@ enum NotificationType {
   Liked
   Mentioned
   Replied
+  DMed
 }
 
 type Conversation {

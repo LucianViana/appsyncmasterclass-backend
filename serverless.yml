@@ -31,6 +31,16 @@ custom:
   #       NODE 14: "TypeError: fs.rmSync
   #serverless-layers:
   #  layersDeploymentBucket: ${ssm:/appsyncmasterclass/${self:custom.stage}/layer-deployment-bucket}
+  appSyncCaching:
+    dev-yan10:
+      behavior: PER_RESOLVER_CACHING
+      ttl: 3600
+      type: T2_SMALL  
+    default:
+    prod:
+      behavior: PER_RESOLVER_CACHING
+      ttl: 3600
+      type: T2_SMALL
 
 functions:
   confirmUserSignup:
@@ -274,6 +284,20 @@ functions:
         Action: dynamodb:GetItem
         Resource: !GetAtt TweetsTable.Arn
 
+  notifyDmed:
+    iamRoleStatementsName: notifyDmed  
+    handler: functions/notify-dmed.handler
+    environment:
+      GRAPHQL_API_URL: !GetAtt AppsyncmasterclassGraphQlApi.GraphQLUrl
+    events:
+      - stream:
+          type: dynamodb
+          arn: !GetAtt DirectMessagesTable.StreamArn
+    iamRoleStatements:
+      - Effect: Allow
+        Action: appsync:GraphQL
+        Resource: !Sub ${AppsyncmasterclassGraphQlApi.Arn}/*
+
   sendDirectMessage:
     handler: functions/send-direct-message.handler
     iamRoleStatementsName: sendDirectMessage     
@@ -288,6 +312,15 @@ functions:
       - Effect: Allow
         Action: dynamodb:UpdateItem
         Resource: !GetAtt ConversationsTable.Arn
+
+  getTweetCreator:
+    handler: functions/get-tweet-creator.handler
+    environment:
+      USERS_TABLE: !Ref UsersTable
+    iamRoleStatements:
+      - Effect: Allow
+        Action: dynamodb:BatchGetItem
+        Resource: !GetAtt UsersTable.Arn
 
 resources:
   Resources:
